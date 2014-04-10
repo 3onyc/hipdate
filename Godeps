@@ -1,0 +1,14 @@
+{
+	"ImportPath": "github.com/3onyc/hipdate",
+	"GoVersion": "go1.2.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Rev": "8d5447b3350dcc7644c7021b3cd57224cbedfa79"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "bd5c6d56f5500f6dfec24953b0cd3d949383aa65"
+		}
+	]
+}
