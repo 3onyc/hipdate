@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/fsouza/go-dockerclient"
+	"github.com/crosbymichael/skydock/docker"
+	"github.com/garyburd/redigo/redis"
 	"log"
 	"os"
 )
@@ -22,16 +23,27 @@ func main() {
 		log.Fatalln("DOCKER_URL environment variable is not set")
 	}
 
-	client, err := docker.NewClient(dockerUrl)
+	redisUrl := os.Getenv("REDIS_URL")
+	if redisUrl == "" {
+		log.Fatalln("REDIS_URL environment variable is not set")
+	}
+	redisEndpoint, err := parseRedisUrl(redisUrl)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Redis:", err)
+	}
+	r, err := redis.Dial("tcp", redisEndpoint)
+	if err != nil {
+		log.Fatalln("Redis:", err)
 	}
 
-	if err := initialise(client); err != nil {
-		log.Fatalln(err)
+	d, err := docker.NewClient(dockerUrl)
+	if err != nil {
+		log.Fatalln("Docker:", err)
 	}
-
-	if err := watch(client); err != nil {
-		log.Fatalln(err)
+	if err := initialise(r, d); err != nil {
+		log.Fatalln("Initialise:", err)
+	}
+	if err := watch(r, d); err != nil {
+		log.Fatalln("Watch:", err)
 	}
 }

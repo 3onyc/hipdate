@@ -2,33 +2,18 @@ package main
 
 import (
 	"errors"
-	"log"
+	"net/url"
 	"strconv"
 	"strings"
 )
 
 // Parse the env variable containing the hostnames
-func parseHostnameVar(hostnameVar string) []*HostPortPair {
-	var hostPortPairs []string
-
+func parseHostnameVar(hostnameVar string) []string {
 	if !strings.Contains(hostnameVar, "|") {
-		hostPortPairs = []string{hostnameVar}
+		return []string{hostnameVar}
 	} else {
-		hostPortPairs = strings.Split(hostnameVar, "|")
+		return strings.Split(hostnameVar, "|")
 	}
-
-	result := []*HostPortPair{}
-	for _, hostPortPair := range hostPortPairs {
-		pair, err := parseHostPortPair(hostPortPair)
-		if err != nil {
-			log.Println("Skipping", hostPortPair, "| Reason:", err)
-			continue
-		}
-
-		result = append(result, pair)
-	}
-
-	return result
 }
 
 // Parse a <hostname>:<port> pair into a HostPortPair struct
@@ -38,15 +23,24 @@ func parseHostPortPair(hostPortPair string) (*HostPortPair, error) {
 	}
 
 	pair := strings.SplitN(hostPortPair, ":", 2)
-	port, err := strconv.ParseUint(pair[1], 10, 16)
+	port, err := parsePort(pair[1])
 	if err != nil {
 		return nil, err
 	}
+
+	return &HostPortPair{pair[0], port}, nil
+}
+
+func parsePort(portStr string) (uint16, error) {
+	port, err := strconv.ParseUint(portStr, 10, 16)
+	if err != nil {
+		return 0, err
+	}
 	if port == 0 {
-		return nil, errors.New("Port can't be 0")
+		return 0, errors.New("Port can't be 0")
 	}
 
-	return &HostPortPair{pair[0], uint16(port)}, nil
+	return uint16(port), nil
 }
 
 // Parse the docker client env var array into a <var>:<value> map
@@ -63,4 +57,17 @@ func parseEnv(envVars []string) map[string]string {
 	}
 
 	return result
+}
+
+func parseRedisUrl(urlStr string) (string, error) {
+	redisUrl, err := url.Parse(urlStr)
+	if err != nil {
+		return "", err
+	}
+
+	if redisUrl.Scheme != "redis" {
+		return "", errors.New("Scheme is not redis://")
+	}
+
+	return redisUrl.Host, nil
 }
