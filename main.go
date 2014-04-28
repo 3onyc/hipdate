@@ -4,7 +4,17 @@ import (
 	"github.com/crosbymichael/skydock/docker"
 	"github.com/garyburd/redigo/redis"
 	"log"
+	"sync"
 )
+
+type IPMap map[string]string
+type Application struct {
+	Redis  redis.Conn
+	Docker docker.Docker
+	Hosts  HostList
+	Status sync.WaitGroup
+	IPs    IPMap
+}
 
 type Backend string
 
@@ -18,7 +28,7 @@ func (b Backend) Register(r redis.Conn, h Host) error {
 	return nil
 }
 func (b Backend) Unregister(r redis.Conn, h Host) error {
-	_, err := r.Do("LREM", h.Key(), b)
+	_, err := r.Do("LREM", h.Key(), 0, b)
 	if err != nil {
 		return err
 	}
@@ -28,6 +38,15 @@ func (b Backend) Unregister(r redis.Conn, h Host) error {
 }
 
 type Host string
+
+func (h Host) Exists(r redis.Conn) (bool, error) {
+	exists, err := redis.Bool(r.Do("EXISTS", h.Key()))
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
 
 func (h Host) Delete(r redis.Conn) error {
 	if _, err := r.Do("DEL", h.Key()); err != nil {
@@ -67,10 +86,10 @@ func (h Host) Key() string {
 type BackendList []Backend
 type HostList map[Host]BackendList
 
-func (hl HostList) Append(h Host, b Backend) {
+func (hl HostList) Add(h Host, b Backend) {
 	hl[h] = append(hl[h], b)
 }
-func (hl HostList) Register(r redis.Conn) {
+func (hl HostList) Initialise(r redis.Conn) {
 	for h, bl := range hl {
 		err := h.Initialise(r)
 		if err != nil {
@@ -85,10 +104,4 @@ func (hl HostList) Register(r redis.Conn) {
 			}
 		}
 	}
-}
-
-// TODO
-// Watch for stop/start events on containers, removing/adding them as needed
-func watch(r redis.Conn, d docker.Docker) error {
-	return nil
 }

@@ -40,10 +40,17 @@ func main() {
 	if err != nil {
 		log.Fatalln("Docker:", err)
 	}
-	if err := initialise(r, d); err != nil {
+
+	app := Application{
+		Redis:  r,
+		Docker: d,
+		IPs:    IPMap{},
+	}
+
+	if err := app.initialise(); err != nil {
 		log.Fatalln("Initialise:", err)
 	}
-	if err := watch(r, d); err != nil {
+	if err := app.watch(); err != nil {
 		log.Fatalln("Watch:", err)
 	}
 }
