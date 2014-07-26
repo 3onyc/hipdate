@@ -76,8 +76,6 @@ func (app *Application) Remove(c *docker.Container) {
 	}
 }
 
-// TODO
-// Watch for stop/start events on containers, removing/adding them as needed
 func (app *Application) watch() {
 	e := app.Docker.GetEvents()
 
