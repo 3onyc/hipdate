@@ -6,12 +6,12 @@ all: build docker clean
 
 build:
 	make -C ../
-	cp "$(GOPATH)/bin/hipdate" "$(CURDIR)/hipdate"
+	cp "$(GOPATH)/bin/hipdated" "$(CURDIR)/hipdated"
 
 docker: build
 	docker build -t "$(IMAGE_NAME):$(VERSION)" .
 
 clean:
-	[ ! -f "$(CURDIR)/hipdate" ] || rm "$(CURDIR)/hipdate"
+	[ ! -f "$(CURDIR)/hipdated" ] || rm "$(CURDIR)/hipdated"
 
 .PHONY: build docker clean

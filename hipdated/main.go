@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/3onyc/hipdate"
+	"github.com/3onyc/hipdate/backends"
 	"github.com/crosbymichael/skydock/docker"
 	"github.com/garyburd/redigo/redis"
 	"log"
@@ -27,7 +29,7 @@ func main() {
 	if redisUrl == "" {
 		log.Fatalln("REDIS_URL environment variable is not set")
 	}
-	redisEndpoint, err := parseRedisUrl(redisUrl)
+	redisEndpoint, err := hipdate.ParseRedisUrl(redisUrl)
 	if err != nil {
 		log.Fatalln("Redis:", err)
 	}
@@ -41,11 +43,12 @@ func main() {
 		log.Fatalln("Docker:", err)
 	}
 
-	app := NewApplication(r, d)
+	b := backends.NewHipacheBackend(r)
+	app := hipdate.NewApplication(b, d)
 
-	if err := app.initialise(); err != nil {
+	if err := app.Initialise(); err != nil {
 		log.Fatalln("Initialise:", err)
 	}
 
-	app.watch()
+	app.Watch()
 }

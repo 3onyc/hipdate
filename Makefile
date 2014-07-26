@@ -4,4 +4,4 @@ deps:
 	godep restore
 
 build:
-	go install github.com/3onyc/hipdate
+	go install github.com/3onyc/hipdate/hipdated

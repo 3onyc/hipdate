@@ -1,4 +1,4 @@
-package main
+package hipdate
 
 import (
 	"errors"
@@ -31,7 +31,7 @@ func parseEnv(envVars []string) map[string]string {
 	return result
 }
 
-func parseRedisUrl(urlStr string) (string, error) {
+func ParseRedisUrl(urlStr string) (string, error) {
 	redisUrl, err := url.Parse(urlStr)
 	if err != nil {
 		return "", err

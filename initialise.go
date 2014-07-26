@@ -1,4 +1,4 @@
-package main
+package hipdate
 
 import (
 	"github.com/crosbymichael/skydock/docker"
@@ -7,14 +7,14 @@ import (
 
 // Initialise, adding all running containers to hipache, and removing any
 // dead ones.
-func (app *Application) initialise() error {
+func (app *Application) Initialise() error {
 	cs, err := app.Docker.FetchAllContainers()
 	if err != nil {
 		return err
 	}
 
 	app.Hosts = app.gather(cs)
-	app.Hosts.Initialise(app.Redis)
+	app.Backend.Initialise(app.Hosts)
 
 	return nil
 }

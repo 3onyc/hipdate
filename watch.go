@@ -1,4 +1,4 @@
-package main
+package hipdate
 
 import (
 	"github.com/crosbymichael/skydock/docker"
@@ -26,57 +26,36 @@ func (app *Application) eventHandler(c chan *docker.Event) {
 	}
 }
 
-func (app *Application) Add(c *docker.Container) {
+func (a *Application) Add(c *docker.Container) {
 	cId := ContainerID(c.Id)
 	ip := IPAddress(c.NetworkSettings.IpAddress)
 	u := Upstream("http://" + ip + ":80")
-	app.IPs[cId] = ip
+	a.IPs[cId] = ip
 
 	for _, h := range getHostnames(c) {
-		exists, err := h.Exists(app.Redis)
-		if err != nil {
-			log.Println(err)
-		}
-
-		if !exists {
-			if err := h.Create(app.Redis); err != nil {
-				log.Println(err)
-				continue
-			}
-		}
-
-		if err := u.Register(app.Redis, h); err != nil {
+		if err := a.Backend.AddUpstream(h, u); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
-func (app *Application) Remove(c *docker.Container) {
+func (a *Application) Remove(c *docker.Container) {
 	cId := ContainerID(c.Id)
-	ip, ok := app.IPs[cId]
+	ip, ok := a.IPs[cId]
 	if !ok {
 		return
 	}
-	delete(app.IPs, cId)
+	delete(a.IPs, cId)
 	u := Upstream("http://" + ip + ":80")
 
 	for _, h := range getHostnames(c) {
-		exists, err := h.Exists(app.Redis)
-		if err != nil {
-			log.Println(err)
-		}
-
-		if !exists {
-			continue
-		}
-
-		if err := u.Unregister(app.Redis, h); err != nil {
+		if err := a.Backend.RemoveUpstream(h, u); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
-func (app *Application) watch() {
+func (app *Application) Watch() {
 	e := app.Docker.GetEvents()
 
 	app.Status.Add(1)
