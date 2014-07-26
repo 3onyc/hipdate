@@ -41,11 +41,7 @@ func main() {
 		log.Fatalln("Docker:", err)
 	}
 
-	app := Application{
-		Redis:  r,
-		Docker: d,
-		IPs:    IPMap{},
-	}
+	app := NewApplication(r, d)
 
 	if err := app.initialise(); err != nil {
 		log.Fatalln("Initialise:", err)

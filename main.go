@@ -16,6 +16,17 @@ type Application struct {
 	IPs    IPMap
 }
 
+func NewApplication(
+	r redis.Conn,
+	d docker.Docker,
+) *Application {
+	return &Application{
+		Redis:  r,
+		Docker: d,
+		IPs:    IPMap{},
+	}
+}
+
 type Backend string
 
 func (b Backend) Register(r redis.Conn, h Host) error {
