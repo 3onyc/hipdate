@@ -78,23 +78,6 @@ func (hb *HipacheBackend) HostInitialise(h hipdate.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) Initialise(hl hipdate.HostList) {
-	for h, ul := range hl {
-		err := hb.HostInitialise(h)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		for u := range ul {
-			err := hb.AddUpstream(h, u)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}
-}
-
 func NewHipacheBackend(r redis.Conn) *HipacheBackend {
 	return &HipacheBackend{
 		r: r,
