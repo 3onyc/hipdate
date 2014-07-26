@@ -14,13 +14,13 @@ func (hb *HipacheBackend) AddUpstream(
 	h hipdate.Host,
 	u hipdate.Upstream,
 ) error {
-	exists, err := hb.HostExists(h)
+	exists, err := hb.hostExists(h)
 	if err != nil {
 		log.Println(err)
 	}
 
 	if !exists {
-		if err := hb.HostCreate(h); err != nil {
+		if err := hb.hostCreate(h); err != nil {
 			log.Println(err)
 		}
 	}
@@ -43,11 +43,11 @@ func (hb *HipacheBackend) RemoveUpstream(
 	log.Println("Unregistered", h, u)
 	return nil
 }
-func (hb *HipacheBackend) HostExists(h hipdate.Host) (bool, error) {
+func (hb *HipacheBackend) hostExists(h hipdate.Host) (bool, error) {
 	return redis.Bool(hb.r.Do("EXISTS", h.Key()))
 }
 
-func (hb *HipacheBackend) HostDelete(h hipdate.Host) error {
+func (hb *HipacheBackend) hostDelete(h hipdate.Host) error {
 	if _, err := hb.r.Do("DEL", h.Key()); err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (hb *HipacheBackend) HostDelete(h hipdate.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) HostCreate(h hipdate.Host) error {
+func (hb *HipacheBackend) hostCreate(h hipdate.Host) error {
 	if _, err := hb.r.Do("RPUSH", h.Key(), h); err != nil {
 		return err
 	}
@@ -65,12 +65,12 @@ func (hb *HipacheBackend) HostCreate(h hipdate.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) HostInitialise(h hipdate.Host) error {
-	if err := hb.HostDelete(h); err != nil {
+func (hb *HipacheBackend) hostClear(h hipdate.Host) error {
+	if err := hb.hostDelete(h); err != nil {
 		return err
 	}
 
-	if err := hb.HostCreate(h); err != nil {
+	if err := hb.hostCreate(h); err != nil {
 		return err
 	}
 
