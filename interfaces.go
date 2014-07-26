@@ -5,3 +5,8 @@ type Backend interface {
 	RemoveUpstream(h Host, u Upstream) error
 	Initialise(hl HostList)
 }
+
+type Source interface {
+	Start()
+	Stop()
+}

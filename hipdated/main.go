@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/3onyc/hipdate"
 	"github.com/3onyc/hipdate/backends"
+	"github.com/3onyc/hipdate/sources"
 	"github.com/crosbymichael/skydock/docker"
 	"github.com/garyburd/redigo/redis"
 	"log"
@@ -43,12 +44,14 @@ func main() {
 		log.Fatalln("Docker:", err)
 	}
 
-	b := backends.NewHipacheBackend(r)
-	app := hipdate.NewApplication(b, d)
-
-	if err := app.Initialise(); err != nil {
-		log.Fatalln("Initialise:", err)
+	ce := make(chan *hipdate.ChangeEvent)
+	s := []hipdate.Source{
+		sources.NewDockerSource(d, ce),
 	}
 
-	app.Watch()
+	b := backends.NewHipacheBackend(r)
+	app := hipdate.NewApplication(b, s, ce)
+
+	log.Println("Starting...")
+	app.Start()
 }

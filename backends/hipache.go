@@ -86,7 +86,7 @@ func (hb *HipacheBackend) Initialise(hl hipdate.HostList) {
 			continue
 		}
 
-		for _, u := range ul {
+		for u := range ul {
 			err := hb.AddUpstream(h, u)
 			if err != nil {
 				log.Println(err)
