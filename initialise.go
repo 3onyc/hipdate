@@ -36,16 +36,3 @@ func (app *Application) gather(cs []*docker.Container) HostList {
 	}
 	return hl
 }
-
-func getHostnames(c *docker.Container) []Host {
-	env := parseEnv(c.Config.Env)
-	hosts := []Host{}
-
-	if _, exists := env["WEB_HOSTNAME"]; exists {
-		for _, host := range parseHostnameVar(env["WEB_HOSTNAME"]) {
-			hosts = append(hosts, Host(host))
-		}
-	}
-
-	return hosts
-}
