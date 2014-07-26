@@ -8,7 +8,6 @@ import (
 type Application struct {
 	Backend     Backend
 	Sources     []Source
-	Hosts       HostList
 	Status      sync.WaitGroup
 	EventStream chan *ChangeEvent
 }
@@ -21,31 +20,25 @@ func NewApplication(
 	return &Application{
 		Backend:     b,
 		Sources:     s,
-		Hosts:       HostList{},
 		EventStream: cce,
 	}
 }
 
 func (a *Application) Add(h Host, ip IPAddress) {
-	u := Upstream("http://" + ip + ":80")
-	a.Hosts.Add(h, u)
-	a.Backend.AddUpstream(h, u)
 }
 
 func (a *Application) Remove(h Host, ip IPAddress) {
-	u := Upstream("http://" + ip + ":80")
-	a.Hosts.Remove(h, u)
-	a.Backend.RemoveUpstream(h, u)
 }
 
 func (a *Application) EventListener() {
 	for ce := range a.EventStream {
 		log.Printf("Event received %v\n", ce)
+		u := Upstream("http://" + ce.IP + ":80")
 		switch ce.Type {
 		case "add":
-			a.Add(ce.Host, ce.IP)
+			a.Backend.AddUpstream(ce.Host, u)
 		case "remove":
-			a.Remove(ce.Host, ce.IP)
+			a.Backend.RemoveUpstream(ce.Host, u)
 		}
 	}
 }
