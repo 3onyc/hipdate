@@ -29,23 +29,23 @@ func NewApplication(
 	}
 }
 
-type Backend string
+type Upstream string
 
-func (b Backend) Register(r redis.Conn, h Host) error {
-	_, err := r.Do("RPUSH", h.Key(), b)
+func (u Upstream) Register(r redis.Conn, h Host) error {
+	_, err := r.Do("RPUSH", h.Key(), u)
 	if err != nil {
 		return err
 	}
-	log.Println("Registered", h, b)
+	log.Println("Registered", h, u)
 
 	return nil
 }
-func (b Backend) Unregister(r redis.Conn, h Host) error {
-	_, err := r.Do("LREM", h.Key(), 0, b)
+func (u Upstream) Unregister(r redis.Conn, h Host) error {
+	_, err := r.Do("LREM", h.Key(), 0, u)
 	if err != nil {
 		return err
 	}
-	log.Println("Unregistered", h, b)
+	log.Println("Unregistered", h, u)
 
 	return nil
 }
@@ -96,22 +96,22 @@ func (h Host) Key() string {
 	return "frontend:" + string(h)
 }
 
-type BackendList []Backend
-type HostList map[Host]BackendList
+type UpstreamList []Upstream
+type HostList map[Host]UpstreamList
 
-func (hl HostList) Add(h Host, b Backend) {
-	hl[h] = append(hl[h], b)
+func (hl HostList) Add(h Host, u Upstream) {
+	hl[h] = append(hl[h], u)
 }
 func (hl HostList) Initialise(r redis.Conn) {
-	for h, bl := range hl {
+	for h, ul := range hl {
 		err := h.Initialise(r)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
-		for _, b := range bl {
-			err := b.Register(r, h)
+		for _, u := range ul {
+			err := u.Register(r, h)
 			if err != nil {
 				log.Println(err)
 			}

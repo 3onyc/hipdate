@@ -29,7 +29,7 @@ func (app *Application) eventHandler(c chan *docker.Event) {
 func (app *Application) Add(c *docker.Container) {
 	cId := ContainerID(c.Id)
 	ip := IPAddress(c.NetworkSettings.IpAddress)
-	b := Backend("http://" + ip + ":80")
+	u := Upstream("http://" + ip + ":80")
 	app.IPs[cId] = ip
 
 	for _, h := range getHostnames(c) {
@@ -45,7 +45,7 @@ func (app *Application) Add(c *docker.Container) {
 			}
 		}
 
-		if err := b.Register(app.Redis, h); err != nil {
+		if err := u.Register(app.Redis, h); err != nil {
 			log.Println(err)
 		}
 	}
@@ -58,7 +58,7 @@ func (app *Application) Remove(c *docker.Container) {
 		return
 	}
 	delete(app.IPs, cId)
-	b := Backend("http://" + ip + ":80")
+	u := Upstream("http://" + ip + ":80")
 
 	for _, h := range getHostnames(c) {
 		exists, err := h.Exists(app.Redis)
@@ -70,7 +70,7 @@ func (app *Application) Remove(c *docker.Container) {
 			continue
 		}
 
-		if err := b.Unregister(app.Redis, h); err != nil {
+		if err := u.Unregister(app.Redis, h); err != nil {
 			log.Println(err)
 		}
 	}

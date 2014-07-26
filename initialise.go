@@ -31,7 +31,7 @@ func (app *Application) gather(cs []*docker.Container) HostList {
 
 		ip := IPAddress(c.NetworkSettings.IpAddress)
 		for _, h := range getHostnames(c) {
-			hl.Add(Host(h), Backend("http://"+ip+":80"))
+			hl.Add(Host(h), Upstream("http://"+ip+":80"))
 			app.IPs[cId] = ip
 		}
 	}
