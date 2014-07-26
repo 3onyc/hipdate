@@ -76,7 +76,7 @@ func (app *Application) Remove(c *docker.Container) {
 
 // TODO
 // Watch for stop/start events on containers, removing/adding them as needed
-func (app *Application) watch() error {
+func (app *Application) watch() {
 	e := app.Docker.GetEvents()
 
 	app.Status.Add(1)
@@ -85,6 +85,4 @@ func (app *Application) watch() error {
 	log.Printf("Starting main process")
 	app.Status.Wait()
 	log.Printf("Stopping cleanly via EOF")
-
-	return nil
 }

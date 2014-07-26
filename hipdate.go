@@ -46,7 +46,6 @@ func main() {
 	if err := app.initialise(); err != nil {
 		log.Fatalln("Initialise:", err)
 	}
-	if err := app.watch(); err != nil {
-		log.Fatalln("Watch:", err)
-	}
+
+	app.watch()
 }
