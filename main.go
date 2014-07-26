@@ -119,6 +119,15 @@ func (hl HostList) Initialise(r redis.Conn) {
 	}
 }
 
+func (hl HostList) Dump() {
+	for h, ul := range hl {
+		log.Println(" -", h)
+		for _, u := range ul {
+			log.Println("   -", u)
+		}
+	}
+}
+
 func getHostnames(c *docker.Container) []Host {
 	env := parseEnv(c.Config.Env)
 	hosts := []Host{}
