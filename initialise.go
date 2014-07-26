@@ -23,15 +23,16 @@ func (app *Application) gather(cs []*docker.Container) HostList {
 	hl := HostList{}
 	for _, c := range cs {
 		c, err := app.Docker.FetchContainer(c.Id, c.Image)
+		cId := ContainerID(c.Id)
 		if err != nil {
 			log.Println(c.Id, err)
 			continue
 		}
 
-		ip := c.NetworkSettings.IpAddress
+		ip := IPAddress(c.NetworkSettings.IpAddress)
 		for _, h := range getHostnames(c) {
 			hl.Add(Host(h), Backend("http://"+ip+":80"))
-			app.IPs[c.Id] = ip
+			app.IPs[cId] = ip
 		}
 	}
 	return hl

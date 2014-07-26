@@ -7,7 +7,9 @@ import (
 	"sync"
 )
 
-type IPMap map[string]string
+type IPAddress string
+type ContainerID string
+type IPMap map[ContainerID]IPAddress
 type Application struct {
 	Redis  redis.Conn
 	Docker docker.Docker
