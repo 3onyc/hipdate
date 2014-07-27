@@ -9,6 +9,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"os"
+	"sync"
 )
 
 type HostPortPair struct {
@@ -44,13 +45,16 @@ func main() {
 		log.Fatalln("Docker:", err)
 	}
 
+	wg := &sync.WaitGroup{}
+
+	sc := make(chan bool)
 	ce := make(chan *hipdate.ChangeEvent)
 	s := []hipdate.Source{
-		sources.NewDockerSource(d, ce),
+		sources.NewDockerSource(d, ce, wg, sc),
 	}
 
 	b := backends.NewHipacheBackend(r)
-	app := hipdate.NewApplication(b, s, ce)
+	app := hipdate.NewApplication(b, s, ce, wg, sc)
 
 	log.Println("Starting...")
 	app.Start()

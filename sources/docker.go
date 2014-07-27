@@ -5,6 +5,7 @@ import (
 	"github.com/crosbymichael/skydock/docker"
 	"log"
 	"strings"
+	"sync"
 )
 
 type IPMap map[hipdate.ContainerID]hipdate.IPAddress
@@ -12,13 +13,20 @@ type DockerSource struct {
 	d   docker.Docker
 	cce chan *hipdate.ChangeEvent
 	IPs IPMap
+	wg  *sync.WaitGroup
+	sc  chan bool
 }
 
 func (ds *DockerSource) eventHandler(cde chan *docker.Event) {
-	for e := range cde {
-		log.Printf("received (%s) %s %s", e.Status, e.ContainerId, e.Image)
-		if err := ds.handleEvent(e); err != nil {
-			log.Println(err)
+	for {
+		select {
+		case e := <-cde:
+			log.Printf("received (%s) %s %s", e.Status, e.ContainerId, e.Image)
+			if err := ds.handleEvent(e); err != nil {
+				log.Println(err)
+			}
+		case <-ds.sc:
+			return
 		}
 	}
 }
@@ -44,15 +52,22 @@ func (ds *DockerSource) handleEvent(e *docker.Event) error {
 func NewDockerSource(
 	d docker.Docker,
 	cce chan *hipdate.ChangeEvent,
+	wg *sync.WaitGroup,
+	sc chan bool,
 ) *DockerSource {
 	return &DockerSource{
 		d:   d,
 		cce: cce,
 		IPs: IPMap{},
+		wg:  wg,
+		sc:  sc,
 	}
 }
 
 func (ds *DockerSource) Start() {
+	defer ds.wg.Done()
+	ds.wg.Add(1)
+
 	ds.Initialise()
 	ds.eventHandler(ds.d.GetEvents())
 }
