@@ -6,7 +6,6 @@ import (
 	"github.com/3onyc/hipdate/backends/hipache"
 	"github.com/3onyc/hipdate/sources"
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/garyburd/redigo/redis"
 	"log"
 	"os"
 	"sync"
@@ -31,14 +30,6 @@ func main() {
 	if redisUrl == "" {
 		log.Fatalln("REDIS_URL environment variable is not set")
 	}
-	redisEndpoint, err := hipache.ParseRedisUrl(redisUrl)
-	if err != nil {
-		log.Fatalln("Redis:", err)
-	}
-	r, err := redis.Dial("tcp", redisEndpoint)
-	if err != nil {
-		log.Fatalln("Redis:", err)
-	}
 
 	d, err := docker.NewClient(dockerUrl)
 	if err != nil {
@@ -52,7 +43,11 @@ func main() {
 		sources.NewDockerSource(d, ce, wg),
 	}
 
-	b := hipache.NewHipacheBackend(r)
+	b, err := hipache.NewHipacheBackend(redisUrl)
+	if err != nil {
+		log.Fatalln("ERR:", err)
+	}
+
 	app := hipdate.NewApplication(b, s, ce, wg)
 
 	log.Println("Starting...")

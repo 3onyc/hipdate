@@ -10,10 +10,15 @@ type HipacheBackend struct {
 	r redis.Conn
 }
 
-func NewHipacheBackend(r redis.Conn) *HipacheBackend {
-	return &HipacheBackend{
-		r: r,
+func NewHipacheBackend(ru string) (*HipacheBackend, error) {
+	r, err := createRedisConn(ru)
+	if err != nil {
+		return nil, err
 	}
+
+	return &HipacheBackend{
+		r: *r,
+	}, nil
 }
 
 func (hb *HipacheBackend) AddUpstream(
