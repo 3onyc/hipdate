@@ -30,6 +30,10 @@ func main() {
 	ce := make(chan *shared.ChangeEvent)
 
 	srcs := InitSources(cfg, ce, wg)
+	if len(srcs) == 0 {
+		log.Fatalf("[FATAL] All sources failed to initialise")
+	}
+
 	be, err := InitBackend(cfg)
 	switch {
 	case err == BackendNotFoundError:
