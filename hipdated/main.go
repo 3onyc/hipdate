@@ -5,7 +5,7 @@ import (
 	"github.com/3onyc/hipdate"
 	"github.com/3onyc/hipdate/backends"
 	"github.com/3onyc/hipdate/sources"
-	"github.com/crosbymichael/skydock/docker"
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"os"
@@ -46,15 +46,14 @@ func main() {
 	}
 
 	wg := &sync.WaitGroup{}
-
-	sc := make(chan bool)
 	ce := make(chan *hipdate.ChangeEvent)
+
 	s := []hipdate.Source{
-		sources.NewDockerSource(d, ce, wg, sc),
+		sources.NewDockerSource(d, ce, wg),
 	}
 
 	b := backends.NewHipacheBackend(r)
-	app := hipdate.NewApplication(b, s, ce, wg, sc)
+	app := hipdate.NewApplication(b, s, ce, wg)
 
 	log.Println("Starting...")
 	app.Start()

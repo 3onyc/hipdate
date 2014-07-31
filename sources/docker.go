@@ -2,65 +2,67 @@ package sources
 
 import (
 	"github.com/3onyc/hipdate"
-	"github.com/crosbymichael/skydock/docker"
+	docker "github.com/fsouza/go-dockerclient"
 	"log"
 	"strings"
 	"sync"
 )
 
-type IPMap map[hipdate.ContainerID]hipdate.IPAddress
+type ContainerMap map[hipdate.ContainerID]*ContainerData
+type ContainerData struct {
+	IP        hipdate.IPAddress
+	Hostnames []hipdate.Host
+}
 type DockerSource struct {
-	d   docker.Docker
-	cce chan *hipdate.ChangeEvent
-	IPs IPMap
-	wg  *sync.WaitGroup
-	sc  chan bool
+	d          *docker.Client
+	cde        chan *docker.APIEvents
+	cce        chan *hipdate.ChangeEvent
+	Containers ContainerMap
+	wg         *sync.WaitGroup
 }
 
-func (ds *DockerSource) eventHandler(cde chan *docker.Event) {
+func NewContainerData(i hipdate.IPAddress, h []hipdate.Host) *ContainerData {
+	return &ContainerData{
+		IP:        i,
+		Hostnames: h,
+	}
+}
+
+func (ds *DockerSource) eventHandler(cde chan *docker.APIEvents) {
 	for {
 		select {
 		case e := <-cde:
-			log.Printf("received (%s) %s %s", e.Status, e.ContainerId, e.Image)
+			log.Printf("received (%s) %s", e.Status, e.ID)
 			if err := ds.handleEvent(e); err != nil {
 				log.Println(err)
 			}
-		case <-ds.sc:
-			return
 		}
 	}
 }
 
-func (ds *DockerSource) handleEvent(e *docker.Event) error {
-	c, err := ds.d.FetchContainer(e.ContainerId, e.Image)
-	if err != nil {
-		return err
-	}
-
-	for _, h := range getHostnames(c) {
-		switch e.Status {
-		case "die", "stop", "kill":
-			ds.handleAdd(c, h)
-		case "start", "restart":
-			ds.handleRemove(c, h)
-		}
+func (ds *DockerSource) handleEvent(e *docker.APIEvents) error {
+	cId := hipdate.ContainerID(e.ID)
+	switch e.Status {
+	case "die", "stop", "kill":
+		ds.handleRemove(cId)
+	case "start", "restart":
+		ds.handleAdd(cId)
 	}
 
 	return nil
 }
 
 func NewDockerSource(
-	d docker.Docker,
+	d *docker.Client,
 	cce chan *hipdate.ChangeEvent,
 	wg *sync.WaitGroup,
-	sc chan bool,
 ) *DockerSource {
 	return &DockerSource{
-		d:   d,
-		cce: cce,
-		IPs: IPMap{},
-		wg:  wg,
-		sc:  sc,
+		d:          d,
+		cce:        cce,
+		cde:        make(chan *docker.APIEvents),
+		Containers: ContainerMap{},
+		wg:         wg,
 	}
 }
 
@@ -69,49 +71,56 @@ func (ds *DockerSource) Start() {
 	ds.wg.Add(1)
 
 	ds.Initialise()
-	ds.eventHandler(ds.d.GetEvents())
+
+	log.Println("Starting docker event listener...")
+
+	ds.d.AddEventListener(ds.cde)
+	ds.eventHandler(ds.cde)
 }
 
 func (ds DockerSource) Stop() {
-
+	ds.d.RemoveEventListener(ds.cde)
 }
 
-func (ds DockerSource) handleAdd(c *docker.Container, h hipdate.Host) {
-	cId := hipdate.ContainerID(c.Id)
-	ip := hipdate.IPAddress(c.NetworkSettings.IpAddress)
-	ds.IPs[cId] = ip
-	e := hipdate.NewChangeEvent("add", h, ip)
-	ds.cce <- e
+func (ds DockerSource) handleAdd(cId hipdate.ContainerID) error {
+	c, err := ds.d.InspectContainer(string(cId))
+	if err != nil {
+		return err
+	}
+
+	ip := hipdate.IPAddress(c.NetworkSettings.IPAddress)
+	hs := getHostnames(c)
+
+	ds.Containers[cId] = NewContainerData(ip, hs)
+	for _, h := range hs {
+		e := hipdate.NewChangeEvent("add", h, ip)
+		ds.cce <- e
+	}
+
+	return nil
 }
 
-func (ds DockerSource) handleRemove(c *docker.Container, h hipdate.Host) {
-	cId := hipdate.ContainerID(c.Id)
-	ip, ok := ds.IPs[cId]
+func (ds DockerSource) handleRemove(cId hipdate.ContainerID) {
+	cd, ok := ds.Containers[cId]
 	if !ok {
 		return
 	}
 
-	delete(ds.IPs, cId)
-	e := hipdate.NewChangeEvent("remove", h, ip)
-	ds.cce <- e
+	delete(ds.Containers, cId)
+	for _, h := range cd.Hostnames {
+		e := hipdate.NewChangeEvent("remove", h, cd.IP)
+		ds.cce <- e
+	}
 }
 
 func (ds DockerSource) Initialise() error {
-	cs, err := ds.d.FetchAllContainers()
+	cs, err := ds.d.ListContainers(docker.ListContainersOptions{})
 	if err != nil {
 		return err
 	}
 
 	for _, c := range cs {
-		c, err := ds.d.FetchContainer(c.Id, c.Image)
-		if err != nil {
-			log.Println(c.Id, err)
-			continue
-		}
-
-		for _, h := range getHostnames(c) {
-			ds.handleAdd(c, h)
-		}
+		ds.handleAdd(hipdate.ContainerID(c.ID))
 	}
 
 	return nil

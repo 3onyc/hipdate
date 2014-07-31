@@ -2,10 +2,7 @@ package hipdate
 
 import (
 	"log"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 )
 
 type Application struct {
@@ -21,14 +18,12 @@ func NewApplication(
 	s []Source,
 	cce chan *ChangeEvent,
 	wg *sync.WaitGroup,
-	sc chan bool,
 ) *Application {
 	return &Application{
 		Backend:     b,
 		Sources:     s,
 		EventStream: cce,
 		wg:          wg,
-		sc:          sc,
 	}
 }
 
@@ -71,16 +66,4 @@ func (a *Application) Start() {
 
 	a.wg.Wait()
 	log.Printf("Stopping cleanly via EOF")
-}
-
-func (a *Application) registerSignalHandler() {
-
-	sigch := make(chan os.Signal, 1)
-	signal.Notify(sigch, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt)
-
-	go func() {
-		<-sigch
-		a.sc <- true
-		log.Println("Shutdown received, exiting")
-	}()
 }
