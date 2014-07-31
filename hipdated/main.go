@@ -6,7 +6,6 @@ import (
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
 	"log"
-	"os"
 	"sync"
 
 	_ "github.com/3onyc/hipdate"
@@ -17,7 +16,7 @@ var (
 )
 
 func main() {
-	cfg := ConfigParseEnv(os.Environ())
+	cfg := LoadConfig()
 
 	if cfg.Backend == "" {
 		log.Fatalln("[FATAL] No backend selected")
