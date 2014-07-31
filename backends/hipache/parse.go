@@ -1,8 +1,12 @@
-package hipdate
+package hipache
 
 import (
 	"errors"
 	"net/url"
+)
+
+var (
+	WrongSchemeError = errors.New("Scheme is not redis://")
 )
 
 func ParseRedisUrl(urlStr string) (string, error) {
@@ -12,7 +16,7 @@ func ParseRedisUrl(urlStr string) (string, error) {
 	}
 
 	if redisUrl.Scheme != "redis" {
-		return "", errors.New("Scheme is not redis://")
+		return "", WrongSchemeError
 	}
 
 	return redisUrl.Host, nil

@@ -1,4 +1,4 @@
-package backends
+package hipache
 
 import (
 	"github.com/3onyc/hipdate"

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/3onyc/hipdate"
-	"github.com/3onyc/hipdate/backends"
+	"github.com/3onyc/hipdate/backends/hipache"
 	"github.com/3onyc/hipdate/sources"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/garyburd/redigo/redis"
@@ -31,7 +31,7 @@ func main() {
 	if redisUrl == "" {
 		log.Fatalln("REDIS_URL environment variable is not set")
 	}
-	redisEndpoint, err := hipdate.ParseRedisUrl(redisUrl)
+	redisEndpoint, err := hipache.ParseRedisUrl(redisUrl)
 	if err != nil {
 		log.Fatalln("Redis:", err)
 	}
@@ -52,7 +52,7 @@ func main() {
 		sources.NewDockerSource(d, ce, wg),
 	}
 
-	b := backends.NewHipacheBackend(r)
+	b := hipache.NewHipacheBackend(r)
 	app := hipdate.NewApplication(b, s, ce, wg)
 
 	log.Println("Starting...")
