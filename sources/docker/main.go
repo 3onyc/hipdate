@@ -154,28 +154,12 @@ func parseHostnameVar(hostnameVar string) []string {
 	}
 }
 
-// Parse the docker client env var array into a <var>:<value> map
-func parseEnv(envVars []string) map[string]string {
-	result := map[string]string{}
-
-	for _, envVar := range envVars {
-		pair := strings.SplitN(envVar, "=", 2)
-		if len(pair) != 2 {
-			continue
-		} else {
-			result[pair[0]] = pair[1]
-		}
-	}
-
-	return result
-}
-
 func getHostnames(c *docker.Container) []shared.Host {
-	env := parseEnv(c.Config.Env)
+	env := docker.Env(c.Config.Env)
 	hosts := []shared.Host{}
 
-	if _, exists := env["WEB_HOSTNAME"]; exists {
-		for _, host := range parseHostnameVar(env["WEB_HOSTNAME"]) {
+	if ok := env.Exists("WEB_HOSTNAME"); ok {
+		for _, host := range parseHostnameVar(env.Get("WEB_HOSTNAME")) {
 			hosts = append(hosts, shared.Host(host))
 		}
 	}
