@@ -1,22 +1,25 @@
-package hipdate
+package main
 
 import (
+	"github.com/3onyc/hipdate/backends"
+	"github.com/3onyc/hipdate/shared"
+	"github.com/3onyc/hipdate/sources"
 	"log"
 	"sync"
 )
 
 type Application struct {
-	Backend     Backend
-	Sources     []Source
+	Backend     backends.Backend
+	Sources     []sources.Source
 	wg          *sync.WaitGroup
-	EventStream chan *ChangeEvent
+	EventStream chan *shared.ChangeEvent
 	sc          chan bool
 }
 
 func NewApplication(
-	b Backend,
-	s []Source,
-	cce chan *ChangeEvent,
+	b backends.Backend,
+	s []sources.Source,
+	cce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
 ) *Application {
 	return &Application{
@@ -33,7 +36,7 @@ func (a *Application) EventListener() {
 		select {
 		case ce := <-a.EventStream:
 			log.Printf("Event received %v\n", ce)
-			u := Upstream("http://" + ce.IP + ":80")
+			u := shared.Upstream("http://" + ce.IP + ":80")
 			switch ce.Type {
 			case "add":
 				a.Backend.AddUpstream(ce.Host, u)

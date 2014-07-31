@@ -1,16 +1,27 @@
 package hipache
 
 import (
-	"github.com/3onyc/hipdate"
+	"errors"
+	"github.com/3onyc/hipdate/backends"
+	"github.com/3onyc/hipdate/shared"
 	"github.com/garyburd/redigo/redis"
 	"log"
+)
+
+var (
+	MissingRedisUrlError = errors.New("REDIS_URL not specified")
 )
 
 type HipacheBackend struct {
 	r redis.Conn
 }
 
-func NewHipacheBackend(ru string) (*HipacheBackend, error) {
+func NewHipacheBackend(opts shared.OptionMap) (backends.Backend, error) {
+	ru, ok := opts["REDIS_URL"]
+	if !ok {
+		return nil, MissingRedisUrlError
+	}
+
 	r, err := createRedisConn(ru)
 	if err != nil {
 		return nil, err
@@ -22,8 +33,8 @@ func NewHipacheBackend(ru string) (*HipacheBackend, error) {
 }
 
 func (hb *HipacheBackend) AddUpstream(
-	h hipdate.Host,
-	u hipdate.Upstream,
+	h shared.Host,
+	u shared.Upstream,
 ) error {
 	exists, err := hb.hostExists(h)
 	if err != nil {
@@ -44,8 +55,8 @@ func (hb *HipacheBackend) AddUpstream(
 	return nil
 }
 func (hb *HipacheBackend) RemoveUpstream(
-	h hipdate.Host,
-	u hipdate.Upstream,
+	h shared.Host,
+	u shared.Upstream,
 ) error {
 	if _, err := hb.r.Do("LREM", h.Key(), 0, u); err != nil {
 		return err
@@ -54,11 +65,11 @@ func (hb *HipacheBackend) RemoveUpstream(
 	log.Println("Unregistered", h, u)
 	return nil
 }
-func (hb *HipacheBackend) hostExists(h hipdate.Host) (bool, error) {
+func (hb *HipacheBackend) hostExists(h shared.Host) (bool, error) {
 	return redis.Bool(hb.r.Do("EXISTS", h.Key()))
 }
 
-func (hb *HipacheBackend) hostDelete(h hipdate.Host) error {
+func (hb *HipacheBackend) hostDelete(h shared.Host) error {
 	if _, err := hb.r.Do("DEL", h.Key()); err != nil {
 		return err
 	}
@@ -67,7 +78,7 @@ func (hb *HipacheBackend) hostDelete(h hipdate.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) hostCreate(h hipdate.Host) error {
+func (hb *HipacheBackend) hostCreate(h shared.Host) error {
 	if _, err := hb.r.Do("RPUSH", h.Key(), h); err != nil {
 		return err
 	}
@@ -76,7 +87,7 @@ func (hb *HipacheBackend) hostCreate(h hipdate.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) hostClear(h hipdate.Host) error {
+func (hb *HipacheBackend) hostClear(h shared.Host) error {
 	if err := hb.hostDelete(h); err != nil {
 		return err
 	}
@@ -87,4 +98,8 @@ func (hb *HipacheBackend) hostClear(h hipdate.Host) error {
 
 	log.Println("Initialised", h)
 	return nil
+}
+
+func init() {
+	backends.BackendMap["hipache"] = NewHipacheBackend
 }

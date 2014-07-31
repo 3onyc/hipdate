@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/3onyc/hipdate"
-	"github.com/3onyc/hipdate/backends/hipache"
-	"github.com/3onyc/hipdate/sources/docker"
+	"github.com/3onyc/hipdate/backends"
+	"github.com/3onyc/hipdate/shared"
+	"github.com/3onyc/hipdate/sources"
 	"log"
 	"os"
+	"strings"
 	"sync"
+
+	_ "github.com/3onyc/hipdate"
 )
 
 type HostPortPair struct {
@@ -20,31 +23,53 @@ func (pair HostPortPair) String() string {
 }
 
 func main() {
-	dockerUrl := os.Getenv("DOCKER_URL")
-	if dockerUrl == "" {
-		log.Fatalln("DOCKER_URL environment variable is not set")
+	opts := shared.OptionMap{}
+
+	hb := os.Getenv("HIPDATED_BACKEND")
+	if hb == "" {
+		log.Fatalln("HIPDATED_BACKEND environment variable is not set")
 	}
 
-	redisUrl := os.Getenv("REDIS_URL")
-	if redisUrl == "" {
-		log.Fatalln("REDIS_URL environment variable is not set")
+	hcsStr := os.Getenv("HIPDATED_SOURCES")
+	if hb == "" {
+		log.Fatalln("HIPDATED_SOURCES environment variable is not set")
 	}
+	hcs := strings.Split(hcsStr, ",")
+
+	opts["DOCKER_URL"] = os.Getenv("DOCKER_URL")
+	opts["REDIS_URL"] = os.Getenv("REDIS_URL")
 
 	wg := &sync.WaitGroup{}
-	ce := make(chan *hipdate.ChangeEvent)
+	ce := make(chan *shared.ChangeEvent)
 
-	ds, err := docker.NewDockerSource(dockerUrl, ce, wg)
-	if err != nil {
-		log.Fatalln("ERR", ds)
+	backendInitFn, ok := backends.BackendMap[hb]
+	if !ok {
+		log.Fatalf("ERR: Backend %s not found\n", hb)
 	}
 
-	b, err := hipache.NewHipacheBackend(redisUrl)
+	be, err := backendInitFn(opts)
 	if err != nil {
 		log.Fatalln("ERR:", err)
 	}
 
-	s := []hipdate.Source{ds}
-	app := hipdate.NewApplication(b, s, ce, wg)
+	srcs := []sources.Source{}
+	for _, srcStr := range hcs {
+		srcInitFn, ok := sources.SourceMap[srcStr]
+		if !ok {
+			log.Fatalf("ERR: Source %s not found\n", srcStr)
+			continue
+		}
+
+		src, err := srcInitFn(opts, ce, wg)
+		if err != nil {
+			log.Fatalln("ERR", err)
+			continue
+		}
+
+		srcs = append(srcs, src)
+	}
+
+	app := NewApplication(be, srcs, ce, wg)
 
 	log.Println("Starting...")
 	app.Start()

@@ -1,27 +1,33 @@
 package docker
 
 import (
-	"github.com/3onyc/hipdate"
+	"errors"
+	"github.com/3onyc/hipdate/shared"
+	"github.com/3onyc/hipdate/sources"
 	docker "github.com/fsouza/go-dockerclient"
 	"log"
 	"strings"
 	"sync"
 )
 
-type ContainerMap map[hipdate.ContainerID]*ContainerData
+var (
+	MissingDockerUrlError = errors.New("DOCKER_URL not specified")
+)
+
+type ContainerMap map[shared.ContainerID]*ContainerData
 type ContainerData struct {
-	IP        hipdate.IPAddress
-	Hostnames []hipdate.Host
+	IP        shared.IPAddress
+	Hostnames []shared.Host
 }
 type DockerSource struct {
 	d          *docker.Client
 	cde        chan *docker.APIEvents
-	cce        chan *hipdate.ChangeEvent
+	cce        chan *shared.ChangeEvent
 	Containers ContainerMap
 	wg         *sync.WaitGroup
 }
 
-func NewContainerData(i hipdate.IPAddress, h []hipdate.Host) *ContainerData {
+func NewContainerData(i shared.IPAddress, h []shared.Host) *ContainerData {
 	return &ContainerData{
 		IP:        i,
 		Hostnames: h,
@@ -41,7 +47,7 @@ func (ds *DockerSource) eventHandler(cde chan *docker.APIEvents) {
 }
 
 func (ds *DockerSource) handleEvent(e *docker.APIEvents) error {
-	cId := hipdate.ContainerID(e.ID)
+	cId := shared.ContainerID(e.ID)
 	switch e.Status {
 	case "die", "stop", "kill":
 		ds.handleRemove(cId)
@@ -53,13 +59,18 @@ func (ds *DockerSource) handleEvent(e *docker.APIEvents) error {
 }
 
 func NewDockerSource(
-	du string,
-	cce chan *hipdate.ChangeEvent,
+	opt shared.OptionMap,
+	cce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
 ) (
-	*DockerSource,
+	sources.Source,
 	error,
 ) {
+	du, ok := opt["DOCKER_URL"]
+	if !ok {
+		return nil, MissingDockerUrlError
+	}
+
 	d, err := docker.NewClient(du)
 	if err != nil {
 		return nil, err
@@ -90,25 +101,25 @@ func (ds DockerSource) Stop() {
 	ds.d.RemoveEventListener(ds.cde)
 }
 
-func (ds DockerSource) handleAdd(cId hipdate.ContainerID) error {
+func (ds DockerSource) handleAdd(cId shared.ContainerID) error {
 	c, err := ds.d.InspectContainer(string(cId))
 	if err != nil {
 		return err
 	}
 
-	ip := hipdate.IPAddress(c.NetworkSettings.IPAddress)
+	ip := shared.IPAddress(c.NetworkSettings.IPAddress)
 	hs := getHostnames(c)
 
 	ds.Containers[cId] = NewContainerData(ip, hs)
 	for _, h := range hs {
-		e := hipdate.NewChangeEvent("add", h, ip)
+		e := shared.NewChangeEvent("add", h, ip)
 		ds.cce <- e
 	}
 
 	return nil
 }
 
-func (ds DockerSource) handleRemove(cId hipdate.ContainerID) {
+func (ds DockerSource) handleRemove(cId shared.ContainerID) {
 	cd, ok := ds.Containers[cId]
 	if !ok {
 		return
@@ -116,7 +127,7 @@ func (ds DockerSource) handleRemove(cId hipdate.ContainerID) {
 
 	delete(ds.Containers, cId)
 	for _, h := range cd.Hostnames {
-		e := hipdate.NewChangeEvent("remove", h, cd.IP)
+		e := shared.NewChangeEvent("remove", h, cd.IP)
 		ds.cce <- e
 	}
 }
@@ -128,7 +139,7 @@ func (ds DockerSource) Initialise() error {
 	}
 
 	for _, c := range cs {
-		ds.handleAdd(hipdate.ContainerID(c.ID))
+		ds.handleAdd(shared.ContainerID(c.ID))
 	}
 
 	return nil
@@ -159,15 +170,19 @@ func parseEnv(envVars []string) map[string]string {
 	return result
 }
 
-func getHostnames(c *docker.Container) []hipdate.Host {
+func getHostnames(c *docker.Container) []shared.Host {
 	env := parseEnv(c.Config.Env)
-	hosts := []hipdate.Host{}
+	hosts := []shared.Host{}
 
 	if _, exists := env["WEB_HOSTNAME"]; exists {
 		for _, host := range parseHostnameVar(env["WEB_HOSTNAME"]) {
-			hosts = append(hosts, hipdate.Host(host))
+			hosts = append(hosts, shared.Host(host))
 		}
 	}
 
 	return hosts
+}
+
+func init() {
+	sources.SourceMap["docker"] = NewDockerSource
 }

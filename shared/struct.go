@@ -1,4 +1,6 @@
-package hipdate
+package shared
+
+type OptionMap map[string]string
 
 type ChangeEvent struct {
 	Type string
