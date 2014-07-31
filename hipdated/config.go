@@ -35,6 +35,7 @@ func LoadConfig() Config {
 	}
 
 	cfg.Merge(ConfigParseEnv(os.Environ()))
+	cfg.Merge(ConfigParseFlags())
 
 	return cfg
 }
