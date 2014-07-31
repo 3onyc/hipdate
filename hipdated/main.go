@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/3onyc/hipdate/backends"
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
@@ -16,15 +15,6 @@ import (
 var (
 	BackendNotFoundError = errors.New("Backend not found")
 )
-
-type HostPortPair struct {
-	hostname string
-	port     uint16
-}
-
-func (pair HostPortPair) String() string {
-	return fmt.Sprintf("%s:%d", pair.hostname, pair.port)
-}
 
 func main() {
 	cfg := ConfigParseEnv(os.Environ())
