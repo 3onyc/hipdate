@@ -7,7 +7,6 @@ import (
 	"github.com/3onyc/hipdate/sources"
 	"log"
 	"os"
-	"strings"
 	"sync"
 
 	_ "github.com/3onyc/hipdate"
@@ -23,44 +22,38 @@ func (pair HostPortPair) String() string {
 }
 
 func main() {
-	opts := shared.OptionMap{}
+	cfg := ConfigParseEnv(os.Environ())
 
-	hb := os.Getenv("HIPDATED_BACKEND")
-	if hb == "" {
-		log.Fatalln("HIPDATED_BACKEND environment variable is not set")
+	if cfg.Backend == "" {
+		log.Fatalln("No backend selected")
 	}
 
-	hcsStr := os.Getenv("HIPDATED_SOURCES")
-	if hb == "" {
-		log.Fatalln("HIPDATED_SOURCES environment variable is not set")
+	if len(cfg.Sources) == 0 {
+		log.Fatalln("No sources selected")
 	}
-	hcs := strings.Split(hcsStr, ",")
-
-	opts["DOCKER_URL"] = os.Getenv("DOCKER_URL")
-	opts["REDIS_URL"] = os.Getenv("REDIS_URL")
 
 	wg := &sync.WaitGroup{}
 	ce := make(chan *shared.ChangeEvent)
 
-	backendInitFn, ok := backends.BackendMap[hb]
+	backendInitFn, ok := backends.BackendMap[cfg.Backend]
 	if !ok {
-		log.Fatalf("ERR: Backend %s not found\n", hb)
+		log.Fatalf("ERR: Backend %s not found\n", cfg.Backend)
 	}
 
-	be, err := backendInitFn(opts)
+	be, err := backendInitFn(cfg.Options)
 	if err != nil {
 		log.Fatalln("ERR:", err)
 	}
 
 	srcs := []sources.Source{}
-	for _, srcStr := range hcs {
-		srcInitFn, ok := sources.SourceMap[srcStr]
+	for _, sn := range cfg.Sources {
+		srcInitFn, ok := sources.SourceMap[sn]
 		if !ok {
-			log.Fatalf("ERR: Source %s not found\n", srcStr)
+			log.Fatalf("ERR: Source %s not found\n", sn)
 			continue
 		}
 
-		src, err := srcInitFn(opts, ce, wg)
+		src, err := srcInitFn(cfg.Options, ce, wg)
 		if err != nil {
 			log.Fatalln("ERR", err)
 			continue
