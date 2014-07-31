@@ -30,7 +30,10 @@ func ParseOptions(o string) shared.OptionMap {
 }
 
 func LoadConfig() Config {
-	cfg := Config{}
+	cfg := Config{
+		Options: shared.OptionMap{},
+	}
+
 	cfg.Merge(ConfigParseEnv(os.Environ()))
 
 	return cfg
