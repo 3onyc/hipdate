@@ -27,12 +27,6 @@ func NewApplication(
 	}
 }
 
-func (a *Application) Add(h Host, ip IPAddress) {
-}
-
-func (a *Application) Remove(h Host, ip IPAddress) {
-}
-
 func (a *Application) EventListener() {
 	defer a.wg.Done()
 	for {
