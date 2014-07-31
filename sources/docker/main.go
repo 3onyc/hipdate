@@ -147,11 +147,7 @@ func (ds DockerSource) Initialise() error {
 
 // Parse the env variable containing the hostnames
 func parseHostnameVar(hostnameVar string) []string {
-	if !strings.Contains(hostnameVar, "|") {
-		return []string{hostnameVar}
-	} else {
-		return strings.Split(hostnameVar, "|")
-	}
+	return strings.Split(hostnameVar, "|")
 }
 
 func getHostnames(c *docker.Container) []shared.Host {
