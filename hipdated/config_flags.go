@@ -8,7 +8,7 @@ import (
 )
 
 func ConfigParseFlags() Config {
-	cfg := Config{}
+	cfg := NewConfig()
 
 	backend := flag.String("backend", "", "Specify which backend to use")
 	sources := flag.String("sources", "", "List of sources to use (Comma seperated)")

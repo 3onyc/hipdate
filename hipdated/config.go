@@ -13,6 +13,12 @@ type Config struct {
 	Options shared.OptionMap
 }
 
+func NewConfig() Config {
+	return Config{
+		Options: shared.OptionMap{},
+	}
+}
+
 func (cfg *Config) Merge(cfg2 Config) {
 	if cfg2.Backend != "" {
 		cfg.Backend = cfg2.Backend
@@ -30,10 +36,7 @@ func ParseOptions(o string) shared.OptionMap {
 }
 
 func LoadConfig() Config {
-	cfg := Config{
-		Options: shared.OptionMap{},
-	}
-
+	cfg := NewConfig()
 	cfg.Merge(ConfigParseEnv(os.Environ()))
 	cfg.Merge(ConfigParseFlags())
 

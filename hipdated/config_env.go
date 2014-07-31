@@ -7,7 +7,7 @@ import (
 )
 
 func ConfigParseEnv(envArr []string) Config {
-	cfg := Config{}
+	cfg := NewConfig()
 	env := docker.Env(envArr)
 
 	if ok := env.Exists("HIPDATED_BACKEND"); ok {
