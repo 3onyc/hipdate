@@ -14,7 +14,10 @@ type Config struct {
 }
 
 func (cfg *Config) Merge(cfg2 Config) {
-	cfg.Backend = cfg2.Backend
+	if cfg2.Backend != "" {
+		cfg.Backend = cfg2.Backend
+	}
+
 	cfg.Sources = append(cfg.Sources, cfg2.Sources...)
 	for k, v := range cfg2.Options {
 		cfg.Options[k] = v
