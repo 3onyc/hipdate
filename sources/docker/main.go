@@ -76,6 +76,10 @@ func NewDockerSource(
 		return nil, err
 	}
 
+	if err := d.Ping(); err != nil {
+		return nil, err
+	}
+
 	return &DockerSource{
 		d:          d,
 		cce:        cce,
