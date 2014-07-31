@@ -11,6 +11,10 @@ import (
 	_ "github.com/3onyc/hipdate"
 )
 
+const (
+	VERSION = "0.1"
+)
+
 var (
 	BackendNotFoundError = errors.New("Backend not found")
 )
