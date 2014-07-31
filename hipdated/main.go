@@ -59,7 +59,7 @@ func InitSources(
 ) []sources.Source {
 	srcs := []sources.Source{}
 
-	for _, sn := range cfg.Sources {
+	for sn := range cfg.Sources {
 		srcInitFn, ok := sources.SourceMap[sn]
 		if !ok {
 			log.Printf("[SEVERE] Source '%s' not found\n", sn)

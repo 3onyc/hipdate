@@ -7,14 +7,24 @@ import (
 	"strings"
 )
 
+type Sources map[string]interface{}
+
+func (s *Sources) Set(v []string) {
+	*s = Sources{}
+	for _, src := range v {
+		(*s)[src] = nil
+	}
+}
+
 type Config struct {
 	Backend string
-	Sources []string
+	Sources Sources
 	Options shared.OptionMap
 }
 
 func NewConfig() Config {
 	return Config{
+		Sources: Sources{},
 		Options: shared.OptionMap{},
 	}
 }
@@ -24,7 +34,14 @@ func (cfg *Config) Merge(cfg2 Config) {
 		cfg.Backend = cfg2.Backend
 	}
 
-	cfg.Sources = append(cfg.Sources, cfg2.Sources...)
+	for src := range cfg2.Sources {
+		if _, ok := cfg.Sources[src]; ok {
+			continue
+		}
+
+		cfg.Sources[src] = nil
+	}
+
 	for k, v := range cfg2.Options {
 		cfg.Options[k] = v
 	}

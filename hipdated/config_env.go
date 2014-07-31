@@ -15,7 +15,7 @@ func ConfigParseEnv(envArr []string) Config {
 	}
 
 	if ok := env.Exists("HIPDATED_SOURCES"); ok {
-		cfg.Sources = strings.Split(env.Get("HIPDATED_SOURCES"), ",")
+		cfg.Sources.Set(strings.Split(env.Get("HIPDATED_SOURCES"), ","))
 	}
 
 	if ok := env.Exists("HIPDATED_OPTIONS"); ok {

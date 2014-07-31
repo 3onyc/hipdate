@@ -33,7 +33,7 @@ func ConfigParseFlags() Config {
 	}
 
 	if *sources != "" {
-		cfg.Sources = strings.Split(*sources, ",")
+		cfg.Sources.Set(strings.Split(*sources, ","))
 	}
 
 	if *options != "" {
