@@ -1,4 +1,4 @@
-package sources
+package docker
 
 import (
 	"github.com/3onyc/hipdate"
