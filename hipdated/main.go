@@ -5,7 +5,6 @@ import (
 	"github.com/3onyc/hipdate"
 	"github.com/3onyc/hipdate/backends/hipache"
 	"github.com/3onyc/hipdate/sources/docker"
-	dockerclient "github.com/fsouza/go-dockerclient"
 	"log"
 	"os"
 	"sync"
@@ -31,16 +30,12 @@ func main() {
 		log.Fatalln("REDIS_URL environment variable is not set")
 	}
 
-	d, err := dockerclient.NewClient(dockerUrl)
-	if err != nil {
-		log.Fatalln("Docker:", err)
-	}
-
 	wg := &sync.WaitGroup{}
 	ce := make(chan *hipdate.ChangeEvent)
 
-	s := []hipdate.Source{
-		docker.NewDockerSource(d, ce, wg),
+	ds, err := docker.NewDockerSource(dockerUrl, ce, wg)
+	if err != nil {
+		log.Fatalln("ERR", ds)
 	}
 
 	b, err := hipache.NewHipacheBackend(redisUrl)
@@ -48,6 +43,7 @@ func main() {
 		log.Fatalln("ERR:", err)
 	}
 
+	s := []hipdate.Source{ds}
 	app := hipdate.NewApplication(b, s, ce, wg)
 
 	log.Println("Starting...")

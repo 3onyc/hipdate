@@ -53,17 +53,25 @@ func (ds *DockerSource) handleEvent(e *docker.APIEvents) error {
 }
 
 func NewDockerSource(
-	d *docker.Client,
+	du string,
 	cce chan *hipdate.ChangeEvent,
 	wg *sync.WaitGroup,
-) *DockerSource {
+) (
+	*DockerSource,
+	error,
+) {
+	d, err := docker.NewClient(du)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DockerSource{
 		d:          d,
 		cce:        cce,
 		cde:        make(chan *docker.APIEvents),
 		Containers: ContainerMap{},
 		wg:         wg,
-	}
+	}, nil
 }
 
 func (ds *DockerSource) Start() {
