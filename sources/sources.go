@@ -14,6 +14,7 @@ type SourceInitFunc func(
 	opt shared.OptionMap,
 	cce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
+	sc chan bool,
 ) (
 	Source,
 	error,

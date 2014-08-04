@@ -6,7 +6,10 @@ import (
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
 	"log"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	_ "github.com/3onyc/hipdate"
 )
@@ -32,8 +35,11 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 	ce := make(chan *shared.ChangeEvent)
+	sc := make(chan bool)
 
-	srcs := InitSources(cfg, ce, wg)
+	registerSignals(sc)
+
+	srcs := InitSources(cfg, ce, wg, sc)
 	if len(srcs) == 0 {
 		log.Fatalf("[FATAL] All sources failed to initialise")
 	}
@@ -46,7 +52,7 @@ func main() {
 		log.Fatalf("[FATAL][backend:%s] %s", cfg.Backend, err)
 	}
 
-	app := NewApplication(be, srcs, ce, wg)
+	app := NewApplication(be, srcs, ce, wg, sc)
 
 	log.Println("Starting...")
 	app.Start()
@@ -56,6 +62,7 @@ func InitSources(
 	cfg Config,
 	ce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
+	sc chan bool,
 ) []sources.Source {
 	srcs := []sources.Source{}
 
@@ -66,7 +73,7 @@ func InitSources(
 			continue
 		}
 
-		src, err := srcInitFn(cfg.Options, ce, wg)
+		src, err := srcInitFn(cfg.Options, ce, wg, sc)
 		if err != nil {
 			log.Printf("[SEVERE][source:%s] %s", sn, err)
 			continue
@@ -90,4 +97,13 @@ func InitBackend(cfg Config) (backends.Backend, error) {
 	}
 
 	return be, nil
+}
+
+func registerSignals(sc chan bool) {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		_ = <-c
+		close(sc)
+	}()
 }

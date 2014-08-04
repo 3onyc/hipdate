@@ -25,6 +25,7 @@ type DockerSource struct {
 	cce        chan *shared.ChangeEvent
 	Containers ContainerMap
 	wg         *sync.WaitGroup
+	sc         chan bool
 }
 
 func NewContainerData(i shared.IPAddress, h []shared.Host) *ContainerData {
@@ -42,6 +43,9 @@ func (ds *DockerSource) eventHandler(cde chan *docker.APIEvents) {
 			if err := ds.handleEvent(e); err != nil {
 				log.Println(err)
 			}
+		case <-ds.sc:
+			ds.Stop()
+			return
 		}
 	}
 }
@@ -62,6 +66,7 @@ func NewDockerSource(
 	opt shared.OptionMap,
 	cce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
+	sc chan bool,
 ) (
 	sources.Source,
 	error,
@@ -86,6 +91,7 @@ func NewDockerSource(
 		cde:        make(chan *docker.APIEvents),
 		Containers: ContainerMap{},
 		wg:         wg,
+		sc:         sc,
 	}, nil
 }
 
@@ -103,6 +109,7 @@ func (ds *DockerSource) Start() {
 
 func (ds DockerSource) Stop() {
 	ds.d.RemoveEventListener(ds.cde)
+	log.Println("[source:docker] stopped")
 }
 
 func (ds DockerSource) handleAdd(cId shared.ContainerID) error {

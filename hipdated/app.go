@@ -21,17 +21,18 @@ func NewApplication(
 	s []sources.Source,
 	cce chan *shared.ChangeEvent,
 	wg *sync.WaitGroup,
+	sc chan bool,
 ) *Application {
 	return &Application{
 		Backend:     b,
 		Sources:     s,
 		EventStream: cce,
 		wg:          wg,
+		sc:          sc,
 	}
 }
 
 func (a *Application) EventListener() {
-	defer a.wg.Done()
 	for {
 		select {
 		case ce := <-a.EventStream:
@@ -51,7 +52,15 @@ func (a *Application) EventListener() {
 	}
 }
 
+func (a *Application) startEventListener() {
+	defer a.wg.Done()
+
+	a.EventListener()
+	log.Println("[app] stopped")
+}
+
 func (a *Application) Start() {
+	log.Printf("Starting sources")
 	for _, s := range a.Sources {
 		go s.Start()
 	}
@@ -59,7 +68,7 @@ func (a *Application) Start() {
 	log.Printf("Starting main process")
 
 	a.wg.Add(1)
-	go a.EventListener()
+	go a.startEventListener()
 
 	a.wg.Wait()
 	log.Printf("Stopping cleanly via EOF")
