@@ -1,6 +1,44 @@
 package shared
 
+import (
+	"bytes"
+)
+
+type Stoppable struct {
+	stopChan chan bool
+}
+
+func (s Stoppable) ShouldStop() bool {
+	select {
+	case <-s.stopChan:
+		return true
+	default:
+		return false
+	}
+}
+
+func (s Stoppable) setChan(c chan bool) {
+	s.stopChan = c
+}
+
 type OptionMap map[string]string
+type HostList map[Host][]Upstream
+
+func (hl HostList) Pprint() string {
+	buf := bytes.Buffer{}
+
+	buf.WriteString("<h1>Hosts</h1>" + "\n<ul>")
+	for h, bs := range hl {
+		buf.WriteString("<li>" + string(h) + "\n<ul>\n")
+		for _, b := range bs {
+			buf.WriteString("<li>" + string(b) + "</li>\n")
+		}
+		buf.WriteString("</ul>\n</li>\n")
+	}
+	buf.WriteString("</ul>\n")
+
+	return buf.String()
+}
 
 type ChangeEvent struct {
 	Type string

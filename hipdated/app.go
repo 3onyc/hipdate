@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/3onyc/hipdate"
 	"github.com/3onyc/hipdate/backends"
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
@@ -11,6 +12,7 @@ import (
 type Application struct {
 	Backend     backends.Backend
 	Sources     []sources.Source
+	http        *hipdate.HttpServer
 	wg          *sync.WaitGroup
 	EventStream chan *shared.ChangeEvent
 	sc          chan bool
@@ -47,6 +49,7 @@ func (a *Application) EventListener() {
 				break
 			}
 		case <-a.sc:
+			a.http.Stop()
 			return
 		}
 	}
@@ -57,6 +60,13 @@ func (a *Application) startEventListener() {
 
 	a.EventListener()
 	log.Println("[app] stopped")
+}
+
+func (a *Application) startHttpServer() error {
+	defer a.wg.Done()
+
+	a.http = hipdate.NewHttpServer(a.Backend)
+	return a.http.Start()
 }
 
 func (a *Application) Start() {
@@ -72,6 +82,9 @@ func (a *Application) Start() {
 
 	a.wg.Add(1)
 	go a.startEventListener()
+
+	a.wg.Add(1)
+	go a.startHttpServer()
 
 	a.wg.Wait()
 	log.Printf("Stopping cleanly via EOF")

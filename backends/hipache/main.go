@@ -70,6 +70,47 @@ func (hb *HipacheBackend) Initialise() error {
 	return hb.clearHosts()
 }
 
+func (hb *HipacheBackend) ListHosts() *shared.HostList {
+	hl := shared.HostList{}
+
+	fe, err := hb.getFrontends()
+	if err != nil {
+		log.Println("ERROR", err)
+		return nil
+	}
+
+	for _, f := range fe {
+		r, err := redis.Values(hb.r.Do("LRANGE", f, "0", "-1"))
+		if err != nil {
+			log.Println("Error:", err)
+			return nil
+		}
+
+		var vs []string
+		if err := redis.ScanSlice(r, &vs); err != nil {
+			log.Println("Error:", err)
+			continue
+		}
+
+		if len(vs) == 0 {
+			continue
+		}
+
+		h := shared.Host(vs[0])
+		hl[h] = []shared.Upstream{}
+
+		if len(vs) < 2 {
+			continue
+		}
+
+		for _, b := range vs[1:] {
+			hl[h] = append(hl[h], shared.Upstream(b))
+		}
+	}
+
+	return &hl
+}
+
 func (hb *HipacheBackend) getFrontends() ([]string, error) {
 	r, err := redis.Values(hb.r.Do("KEYS", "frontend:*"))
 	if err != nil {
