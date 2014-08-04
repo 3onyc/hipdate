@@ -65,6 +65,25 @@ func (hb *HipacheBackend) RemoveUpstream(
 	log.Println("Unregistered", h, u)
 	return nil
 }
+
+func (hb *HipacheBackend) Initialise() error {
+	return hb.clearHosts()
+}
+
+func (hb *HipacheBackend) getFrontends() ([]string, error) {
+	r, err := redis.Values(hb.r.Do("KEYS", "frontend:*"))
+	if err != nil {
+		return nil, err
+	}
+
+	var fe []string
+	if err := redis.ScanSlice(r, &fe); err != nil {
+		return nil, err
+	}
+
+	return fe, nil
+}
+
 func (hb *HipacheBackend) hostExists(h shared.Host) (bool, error) {
 	return redis.Bool(hb.r.Do("EXISTS", h.Key()))
 }
@@ -87,16 +106,18 @@ func (hb *HipacheBackend) hostCreate(h shared.Host) error {
 	return nil
 }
 
-func (hb *HipacheBackend) hostClear(h shared.Host) error {
-	if err := hb.hostDelete(h); err != nil {
+func (hb *HipacheBackend) clearHosts() error {
+	fe, err := hb.getFrontends()
+	if err != nil {
 		return err
 	}
 
-	if err := hb.hostCreate(h); err != nil {
-		return err
+	for _, f := range fe {
+		if _, err := hb.r.Do("DEL", f); err != nil {
+			return err
+		}
 	}
 
-	log.Println("Initialised", h)
 	return nil
 }
 

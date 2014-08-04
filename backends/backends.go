@@ -7,6 +7,7 @@ import (
 type Backend interface {
 	AddUpstream(h shared.Host, u shared.Upstream) error
 	RemoveUpstream(h shared.Host, u shared.Upstream) error
+	Initialise() error
 }
 
 type BackendInitFunc func(opt shared.OptionMap) (Backend, error)

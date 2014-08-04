@@ -60,6 +60,9 @@ func (a *Application) startEventListener() {
 }
 
 func (a *Application) Start() {
+	log.Printf("Initialising backend")
+	a.Backend.Initialise()
+
 	log.Printf("Starting sources")
 	for _, s := range a.Sources {
 		go s.Start()
