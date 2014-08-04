@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/3onyc/hipdate/shared"
 	docker "github.com/fsouza/go-dockerclient"
+	"log"
 	"os"
 	"strings"
 )
@@ -53,6 +54,8 @@ func ParseOptions(o string) shared.OptionMap {
 }
 
 func LoadConfig() Config {
+	log.Println("Loading config...")
+
 	cfg := NewConfig()
 	cfg.Merge(ConfigParseEnv(os.Environ()))
 	cfg.Merge(ConfigParseFlags())
