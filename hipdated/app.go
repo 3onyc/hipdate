@@ -42,10 +42,14 @@ func (a *Application) EventListener() {
 			u := shared.Upstream("http://" + ce.IP + ":80")
 			switch ce.Type {
 			case "add":
-				a.Backend.AddUpstream(ce.Host, u)
+				if err := a.Backend.AddUpstream(ce.Host, u); err != nil {
+					log.Println("Failed to add upstream", err)
+				}
+				break
 			case "remove":
-				a.Backend.RemoveUpstream(ce.Host, u)
-			case "stop":
+				if err := a.Backend.RemoveUpstream(ce.Host, u); err != nil {
+					log.Println("Failed to remove upstream", err)
+				}
 				break
 			}
 		case <-a.sc:
