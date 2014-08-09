@@ -74,22 +74,25 @@ func (a *Application) startHttpServer() error {
 }
 
 func (a *Application) Start() {
-	log.Printf("Initialising backend")
-	a.Backend.Initialise()
+	log.Println("NOTICE Starting main event listener")
+	a.wg.Add(1)
+	go a.startEventListener()
 
-	log.Printf("Starting sources")
+	log.Printf("NOTICE Initialising backend")
+	err := a.Backend.Initialise()
+	if err != nil {
+		log.Panic("PANIC Backend error:", err)
+	}
+
+	log.Printf("NOTICE Starting sources")
 	for _, s := range a.Sources {
 		go s.Start()
 	}
 
-	log.Printf("Starting main process")
-
-	a.wg.Add(1)
-	go a.startEventListener()
-
+	log.Printf("NOTICE Starting HTTP server")
 	a.wg.Add(1)
 	go a.startHttpServer()
 
 	a.wg.Wait()
-	log.Printf("Stopping cleanly via EOF")
+	log.Println("NOTICE Stopping cleanly via EOF")
 }
