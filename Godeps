@@ -13,6 +13,14 @@
 		{
 			"ImportPath": "github.com/3onyc/stoppableListener",
 			"Rev": "817df4dd7f659a8b6934570bd18da24be4a1af83"
+		},
+		{
+			"importpath": "github.com/mailgun/vulcand/api",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"importpath": "github.com/mailgun/vulcand/plugin/registry",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
 		}
 	]
 }
