@@ -1,6 +1,7 @@
 package hipdate
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/3onyc/hipdate/backends"
 	"github.com/3onyc/stoppableListener"
@@ -33,7 +34,7 @@ func (h *HttpServer) Start() error {
 		return err
 	}
 
-	http.HandleFunc("/status", h.status)
+	http.HandleFunc("/api/v1/status.json", h.status)
 
 	h.l = sl
 	h.s.Serve(h.l)
@@ -47,6 +48,16 @@ func (h *HttpServer) Stop() {
 }
 
 func (h *HttpServer) status(rw http.ResponseWriter, req *http.Request) {
-	rw.Header().Add("Content-Type", "text/html")
-	fmt.Fprintf(rw, h.b.ListHosts().Pprint())
+	rw.Header().Add("Content-Type", "application/json")
+
+	b, err := json.MarshalIndent(h.b.ListHosts(), "", "    ")
+	if err != nil {
+		rw.WriteHeader(500)
+		fmt.Fprint(rw, err)
+		return
+	}
+
+	if _, err := rw.Write(b); err != nil {
+		log.Println("ERROR http", err)
+	}
 }
