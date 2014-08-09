@@ -70,20 +70,18 @@ func (hb *HipacheBackend) Initialise() error {
 	return hb.clearHosts()
 }
 
-func (hb *HipacheBackend) ListHosts() *shared.HostList {
+func (hb *HipacheBackend) ListHosts() (*shared.HostList, error) {
 	hl := shared.HostList{}
 
 	fe, err := hb.getFrontends()
 	if err != nil {
-		log.Println("ERROR", err)
-		return nil
+		return nil, err
 	}
 
 	for _, f := range fe {
 		r, err := redis.Values(hb.r.Do("LRANGE", f, "0", "-1"))
 		if err != nil {
-			log.Println("Error:", err)
-			return nil
+			return nil, err
 		}
 
 		var vs []string
@@ -108,7 +106,7 @@ func (hb *HipacheBackend) ListHosts() *shared.HostList {
 		}
 	}
 
-	return &hl
+	return &hl, nil
 }
 
 func (hb *HipacheBackend) getFrontends() ([]string, error) {

@@ -49,8 +49,14 @@ func (h *HttpServer) Stop() {
 
 func (h *HttpServer) status(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Add("Content-Type", "application/json")
+	hs, err := h.b.ListHosts()
+	if err != nil {
+		rw.WriteHeader(500)
+		fmt.Fprint(rw, err)
+		return
+	}
 
-	b, err := json.MarshalIndent(h.b.ListHosts(), "", "    ")
+	b, err := json.MarshalIndent(hs, "", "    ")
 	if err != nil {
 		rw.WriteHeader(500)
 		fmt.Fprint(rw, err)
