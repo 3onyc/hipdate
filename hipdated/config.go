@@ -70,5 +70,14 @@ func LoadConfig() Config {
 	cfg := NewConfig()
 	cfg.Merge(ConfigParseEnv(os.Environ()))
 
+	if *cfgFile != "" {
+		cfg2, err := ConfigParseJson(*cfgFile)
+		if err != nil {
+			log.Printf("ERROR Failed to load %s: %s\n", *cfgFile, err)
+		} else {
+			cfg.Merge(*cfg2)
+		}
+	}
+
 	return cfg
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"github.com/3onyc/hipdate/backends"
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
@@ -23,6 +24,7 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	cfg := LoadConfig()
 
 	if cfg.Backend == nil {
