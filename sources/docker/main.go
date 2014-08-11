@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	MissingDockerUrlError = errors.New("DOCKER_URL not specified")
+	MissingDockerUrlError = errors.New("Docker url not specified")
 )
 
 type ContainerMap map[shared.ContainerID]*ContainerData
@@ -71,7 +71,7 @@ func NewDockerSource(
 	sources.Source,
 	error,
 ) {
-	du, ok := opt["DOCKER_URL"]
+	du, ok := opt["url"]
 	if !ok {
 		return nil, MissingDockerUrlError
 	}

@@ -20,7 +20,7 @@ type VulcandBackend struct {
 }
 
 func NewVulcandBackend(opts shared.OptionMap) (backends.Backend, error) {
-	eu, ok := opts["vulcand"]
+	eu, ok := opts["url"]
 	if !ok {
 		return nil, MissingApiUrlError
 	}

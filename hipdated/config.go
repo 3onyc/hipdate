@@ -8,40 +8,51 @@ import (
 	"strings"
 )
 
-type Sources map[string]interface{}
+type Source struct {
+	Name    string
+	Options shared.OptionMap
+}
 
-func (s *Sources) Set(v []string) {
-	*s = Sources{}
-	for _, src := range v {
-		(*s)[src] = nil
+func NewSource(n string, o shared.OptionMap) *Source {
+	if o == nil {
+		o = shared.OptionMap{}
 	}
+
+	return &Source{n, o}
+}
+
+type Backend struct {
+	Name    string
+	Options shared.OptionMap
+}
+
+func NewBackend(n string, o shared.OptionMap) *Backend {
+	if o == nil {
+		o = shared.OptionMap{}
+	}
+
+	return &Backend{n, o}
 }
 
 type Config struct {
-	Backend string
-	Sources Sources
+	Backend *Backend
+	Sources []*Source
 	Options shared.OptionMap
 }
 
 func NewConfig() Config {
 	return Config{
-		Sources: Sources{},
+		Sources: []*Source{},
 		Options: shared.OptionMap{},
 	}
 }
 
 func (cfg *Config) Merge(cfg2 Config) {
-	if cfg2.Backend != "" {
+	if cfg2.Backend != nil {
 		cfg.Backend = cfg2.Backend
 	}
 
-	for src := range cfg2.Sources {
-		if _, ok := cfg.Sources[src]; ok {
-			continue
-		}
-
-		cfg.Sources[src] = nil
-	}
+	cfg.Sources = append(cfg.Sources, cfg2.Sources...)
 
 	for k, v := range cfg2.Options {
 		cfg.Options[k] = v
@@ -58,7 +69,6 @@ func LoadConfig() Config {
 
 	cfg := NewConfig()
 	cfg.Merge(ConfigParseEnv(os.Environ()))
-	cfg.Merge(ConfigParseFlags())
 
 	return cfg
 }

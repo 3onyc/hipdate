@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	MissingRedisUrlError = errors.New("REDIS_URL not specified")
+	MissingRedisUrlError = errors.New("redis URL not specified")
 )
 
 type HipacheBackend struct {
@@ -17,7 +17,7 @@ type HipacheBackend struct {
 }
 
 func NewHipacheBackend(opts shared.OptionMap) (backends.Backend, error) {
-	ru, ok := opts["REDIS_URL"]
+	ru, ok := opts["redis"]
 	if !ok {
 		return nil, MissingRedisUrlError
 	}

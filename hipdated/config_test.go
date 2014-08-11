@@ -7,12 +7,12 @@ import (
 func TestConfigMergeBackendOverwrite(t *testing.T) {
 	cfg1, cfg2 := NewConfig(), NewConfig()
 
-	cfg1.Backend = "foo"
-	cfg2.Backend = "bar"
+	cfg1.Backend = NewBackend("foo", nil)
+	cfg2.Backend = NewBackend("bar", nil)
 
 	cfg1.Merge(cfg2)
-	if cfg1.Backend != "bar" {
-		t.Logf("Backend was not overwritten (Value: %s)\n", cfg1.Backend)
+	if cfg1.Backend.Name != "bar" {
+		t.Logf("Backend was not overwritten (Value: %s)\n", cfg1.Backend.Name)
 		t.Fail()
 	}
 }
@@ -20,12 +20,11 @@ func TestConfigMergeBackendOverwrite(t *testing.T) {
 func TestConfigMergeBackendDontOverwriteWithEmpty(t *testing.T) {
 	cfg1, cfg2 := NewConfig(), NewConfig()
 
-	cfg1.Backend = "foo"
-	cfg2.Backend = ""
+	cfg1.Backend = NewBackend("foo", nil)
 
 	cfg1.Merge(cfg2)
-	if cfg1.Backend != "foo" {
-		t.Logf("Backend was overwritten (Value: '%s')\n", cfg1.Backend)
+	if cfg1.Backend.Name != "foo" {
+		t.Log("Backend was overwritten")
 		t.Fail()
 	}
 }
@@ -33,13 +32,12 @@ func TestConfigMergeBackendDontOverwriteWithEmpty(t *testing.T) {
 func TestConfigMergeSources(t *testing.T) {
 	cfg1, cfg2 := NewConfig(), NewConfig()
 
-	cfg1.Sources.Set([]string{"a", "b", "c"})
-	cfg2.Sources.Set([]string{"c", "d", "e"})
+	cfg1.Sources = []*Source{NewSource("a", nil), NewSource("b", nil)}
+	cfg2.Sources = []*Source{NewSource("c", nil), NewSource("d", nil)}
 
 	cfg1.Merge(cfg2)
-	if len(cfg1.Sources) != 5 {
-		t.Logf("Sources has wrong length (length '%d')\n", len(cfg1.Sources))
-		t.Log("Which indicates duplicates")
+	if len(cfg1.Sources) != 4 {
+		t.Logf("Sources length not 4 (length '%d')\n", len(cfg1.Sources))
 		t.Fail()
 	}
 }

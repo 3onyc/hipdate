@@ -25,7 +25,7 @@ var (
 func main() {
 	cfg := LoadConfig()
 
-	if cfg.Backend == "" {
+	if cfg.Backend == nil {
 		log.Fatalln("[FATAL] No backend selected")
 	}
 
@@ -47,9 +47,9 @@ func main() {
 	be, err := InitBackend(cfg)
 	switch {
 	case err == BackendNotFoundError:
-		log.Fatalf("[FATAL] Backend '%s' not found\n", cfg.Backend)
+		log.Fatalf("[FATAL] Backend '%s' not found\n", cfg.Backend.Name)
 	case err != nil:
-		log.Fatalf("[FATAL][backend:%s] %s", cfg.Backend, err)
+		log.Fatalf("[FATAL][backend:%s] %s", cfg.Backend.Name, err)
 	}
 
 	app := NewApplication(be, srcs, ce, wg, sc)
@@ -66,16 +66,16 @@ func InitSources(
 ) []sources.Source {
 	srcs := []sources.Source{}
 
-	for sn := range cfg.Sources {
-		srcInitFn, ok := sources.SourceMap[sn]
+	for _, s := range cfg.Sources {
+		srcInitFn, ok := sources.SourceMap[s.Name]
 		if !ok {
-			log.Printf("[SEVERE] Source '%s' not found\n", sn)
+			log.Printf("[SEVERE] Source '%s' not found\n", s.Name)
 			continue
 		}
 
-		src, err := srcInitFn(cfg.Options, ce, wg, sc)
+		src, err := srcInitFn(s.Options, ce, wg, sc)
 		if err != nil {
-			log.Printf("[SEVERE][source:%s] %s", sn, err)
+			log.Printf("[SEVERE][source:%s] %s", s.Name, err)
 			continue
 		}
 
@@ -86,12 +86,12 @@ func InitSources(
 }
 
 func InitBackend(cfg Config) (backends.Backend, error) {
-	backendInitFn, ok := backends.BackendMap[cfg.Backend]
+	backendInitFn, ok := backends.BackendMap[cfg.Backend.Name]
 	if !ok {
 		return nil, BackendNotFoundError
 	}
 
-	be, err := backendInitFn(cfg.Options)
+	be, err := backendInitFn(cfg.Backend.Options)
 	if err != nil {
 		return nil, err
 	}
