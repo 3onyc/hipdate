@@ -6,7 +6,6 @@ import (
 	"github.com/3onyc/hipdate/shared"
 	vulcan "github.com/mailgun/vulcand/api"
 	"github.com/mailgun/vulcand/plugin/registry"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -135,8 +134,6 @@ func isError(err error) bool {
 	if err == nil {
 		return false
 	}
-
-	log.Printf("DEBUG [backend:vulcand] isError: %s\n", err)
 
 	if strings.Contains(err.Error(), "already exists") {
 		return false
