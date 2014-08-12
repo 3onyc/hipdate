@@ -44,7 +44,7 @@ func (h *HttpServer) Start() error {
 
 func (h *HttpServer) Stop() {
 	h.l.Stop()
-	log.Println("[http] stopped")
+	log.Println("NOTICE [http] stopped")
 }
 
 func (h *HttpServer) status(rw http.ResponseWriter, req *http.Request) {
@@ -64,6 +64,6 @@ func (h *HttpServer) status(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if _, err := rw.Write(b); err != nil {
-		log.Println("ERROR http", err)
+		log.Println("ERROR [http]", err)
 	}
 }

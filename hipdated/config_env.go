@@ -1,9 +1,8 @@
 package main
 
 import (
-	"strings"
-
 	docker "github.com/fsouza/go-dockerclient"
+	"strings"
 )
 
 func ConfigParseEnv(envArr []string) Config {

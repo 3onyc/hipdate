@@ -65,7 +65,7 @@ func ParseOptions(o string) shared.OptionMap {
 }
 
 func LoadConfig() Config {
-	log.Println("Loading config...")
+	log.Println("NOTICE Loading config...")
 
 	cfg := NewConfig()
 	cfg.Merge(ConfigParseEnv(os.Environ()))

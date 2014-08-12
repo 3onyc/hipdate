@@ -50,7 +50,7 @@ func (hb *HipacheBackend) AddUpstream(
 	if _, err := hb.r.Do("RPUSH", h.Key(), u); err != nil {
 		return err
 	}
-	log.Println("Registered", h, u)
+	log.Println("DEBUG [backend:hipache] Upstream added", h, u)
 
 	return nil
 }
@@ -62,7 +62,7 @@ func (hb *HipacheBackend) RemoveUpstream(
 		return err
 	}
 
-	log.Println("Unregistered", h, u)
+	log.Println("DEBUG [backend:hipache] Upstream removed", h, u)
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (hb *HipacheBackend) ListHosts() (*shared.HostList, error) {
 
 		var vs []string
 		if err := redis.ScanSlice(r, &vs); err != nil {
-			log.Println("Error:", err)
+			log.Println("ERROR [backend:hipache] ", err)
 			continue
 		}
 
@@ -131,7 +131,7 @@ func (hb *HipacheBackend) hostDelete(h shared.Host) error {
 	if _, err := hb.r.Do("DEL", h.Key()); err != nil {
 		return err
 	}
-	log.Println("Deleted", h)
+	log.Printf("DEBUG [backend:hipache] Host deleted '%s'\n", h)
 
 	return nil
 }
@@ -140,7 +140,7 @@ func (hb *HipacheBackend) hostCreate(h shared.Host) error {
 	if _, err := hb.r.Do("RPUSH", h.Key(), h); err != nil {
 		return err
 	}
-	log.Println("Created", h)
+	log.Printf("DEBUG [backend:hipache] Host created: %s\n", h)
 
 	return nil
 }

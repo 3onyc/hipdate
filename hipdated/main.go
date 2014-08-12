@@ -28,11 +28,11 @@ func main() {
 	cfg := LoadConfig()
 
 	if cfg.Backend == nil {
-		log.Fatalln("[FATAL] No backend selected")
+		log.Fatalln("FATAL No backend selected")
 	}
 
 	if len(cfg.Sources) == 0 {
-		log.Fatalln("[FATAL] No sources selected")
+		log.Fatalln("FATAL No sources selected")
 	}
 
 	wg := &sync.WaitGroup{}
@@ -43,20 +43,20 @@ func main() {
 
 	srcs := InitSources(cfg, ce, wg, sc)
 	if len(srcs) == 0 {
-		log.Fatalf("[FATAL] All sources failed to initialise")
+		log.Fatalf("FATAL All sources failed to initialise")
 	}
 
 	be, err := InitBackend(cfg)
 	switch {
 	case err == BackendNotFoundError:
-		log.Fatalf("[FATAL] Backend '%s' not found\n", cfg.Backend.Name)
+		log.Fatalf("FATAL Backend '%s' not found\n", cfg.Backend.Name)
 	case err != nil:
-		log.Fatalf("[FATAL][backend:%s] %s", cfg.Backend.Name, err)
+		log.Fatalf("FATAL [backend:%s] %s", cfg.Backend.Name, err)
 	}
 
 	app := NewApplication(be, srcs, ce, wg, sc)
 
-	log.Println("Starting...")
+	log.Println("NOTICE Starting...")
 	app.Start()
 }
 
@@ -71,13 +71,13 @@ func InitSources(
 	for _, s := range cfg.Sources {
 		srcInitFn, ok := sources.SourceMap[s.Name]
 		if !ok {
-			log.Printf("[SEVERE] Source '%s' not found\n", s.Name)
+			log.Printf("ERROR Source '%s' not found\n", s.Name)
 			continue
 		}
 
 		src, err := srcInitFn(s.Options, ce, wg, sc)
 		if err != nil {
-			log.Printf("[SEVERE][source:%s] %s", s.Name, err)
+			log.Printf("ERROR [source:%s] %s", s.Name, err)
 			continue
 		}
 

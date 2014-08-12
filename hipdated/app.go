@@ -38,17 +38,17 @@ func (a *Application) EventListener() {
 	for {
 		select {
 		case ce := <-a.EventStream:
-			log.Printf("Event received %v\n", ce)
+			log.Printf("DEBUG Event received %v\n", ce)
 			u := shared.Upstream("http://" + ce.IP + ":80")
 			switch ce.Type {
 			case "add":
 				if err := a.Backend.AddUpstream(ce.Host, u); err != nil {
-					log.Println("Failed to add upstream", err)
+					log.Println("ERROR Failed to add upstream", err)
 				}
 				break
 			case "remove":
 				if err := a.Backend.RemoveUpstream(ce.Host, u); err != nil {
-					log.Println("Failed to remove upstream", err)
+					log.Println("ERROR Failed to remove upstream", err)
 				}
 				break
 			}
@@ -63,7 +63,7 @@ func (a *Application) startEventListener() {
 	defer a.wg.Done()
 
 	a.EventListener()
-	log.Println("[app] stopped")
+	log.Println("NOTICE [app] stopped")
 }
 
 func (a *Application) startHttpServer() error {

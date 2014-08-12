@@ -91,7 +91,7 @@ func (fs *FileSource) Start() {
 
 	log.Println("INFO [source:file] Loading file source...")
 	if err := fs.Initialise(); err != nil {
-		log.Println(err)
+		log.Println("ERROR [source:file]", err)
 	}
 
 	log.Println("INFO [source:file] Starting watcher ...")

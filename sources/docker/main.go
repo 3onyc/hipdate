@@ -39,7 +39,7 @@ func (ds *DockerSource) eventHandler(cde chan *docker.APIEvents) {
 	for {
 		select {
 		case e := <-cde:
-			log.Printf("received (%s) %s", e.Status, e.ID)
+			log.Printf("DEBUG [source:docker] received (%s) %s", e.Status, e.ID)
 			if err := ds.handleEvent(e); err != nil {
 				log.Println(err)
 			}
@@ -101,7 +101,7 @@ func (ds *DockerSource) Start() {
 
 	ds.Initialise()
 
-	log.Println("Starting docker event listener...")
+	log.Println("NOTICE [source:docker] Starting...")
 
 	ds.d.AddEventListener(ds.cde)
 	ds.eventHandler(ds.cde)
@@ -109,7 +109,7 @@ func (ds *DockerSource) Start() {
 
 func (ds DockerSource) Stop() {
 	ds.d.RemoveEventListener(ds.cde)
-	log.Println("[source:docker] stopped")
+	log.Println("NOTICE [source:docker] Stopped")
 }
 
 func (ds DockerSource) handleAdd(cId shared.ContainerID) error {

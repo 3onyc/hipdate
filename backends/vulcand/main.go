@@ -136,7 +136,7 @@ func isError(err error) bool {
 		return false
 	}
 
-	log.Printf("[DEBUG][backend:vulcand] isError: %s\n", err)
+	log.Printf("DEBUG [backend:vulcand] isError: %s\n", err)
 
 	if strings.Contains(err.Error(), "already exists") {
 		return false
