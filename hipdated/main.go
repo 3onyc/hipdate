@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	BackendNotFoundError = errors.New("Backend not found")
+	BackendNotFoundError = errors.New("backend not found")
 )
 
 func main() {

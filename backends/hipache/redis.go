@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	WrongSchemeError = errors.New("Scheme is not redis://")
+	WrongSchemeError = errors.New("scheme is not redis://")
 )
 
 func parseRedisUrl(urlStr string) (string, error) {

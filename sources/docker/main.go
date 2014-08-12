@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	MissingDockerUrlError = errors.New("Docker url not specified")
+	MissingDockerUrlError = errors.New("docker url not specified")
 )
 
 type ContainerMap map[shared.ContainerID]*ContainerData

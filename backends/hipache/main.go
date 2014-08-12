@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	MissingRedisUrlError = errors.New("redis URL not specified")
+	MissingRedisUrlError = errors.New("redis url not specified")
 )
 
 type HipacheBackend struct {

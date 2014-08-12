@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	MissingApiUrlError = errors.New("vulcand API endpoint not specified")
+	MissingApiUrlError = errors.New("vulcand api endpoint not specified")
 )
 
 type VulcandBackend struct {

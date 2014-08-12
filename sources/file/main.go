@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	MissingFilepathError = errors.New("Path not specified")
+	MissingFilepathError = errors.New("path not specified")
 )
 
 type FileSource struct {
