@@ -2,6 +2,8 @@ package shared
 
 import (
 	"bytes"
+	"hash/crc32"
+	"strconv"
 )
 
 type Stoppable struct {
@@ -57,6 +59,11 @@ func NewChangeEvent(t string, h Host, ip IPAddress) *ChangeEvent {
 type IPAddress string
 type ContainerID string
 type Upstream string
+
+func (u Upstream) Hash() string {
+	return strconv.FormatUint(uint64(crc32.ChecksumIEEE([]byte(u))), 10)
+}
+
 type Host string
 
 func (h Host) Key() string {

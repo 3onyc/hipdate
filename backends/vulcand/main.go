@@ -42,7 +42,7 @@ func (vb *VulcandBackend) AddUpstream(
 	hName := string(h)
 	uUrl := string(u)
 	uId := hName + "_up"
-	eId := hName + "_ep"
+	eId := hName + "_ep_" + u.Hash()
 	lId := hName + "_loc"
 
 	if _, err := vb.v.AddHost(string(h)); isError(err) {
@@ -68,7 +68,7 @@ func (vb *VulcandBackend) RemoveUpstream(
 	u shared.Upstream,
 ) error {
 	uId := string(h) + "_up"
-	eId := string(h) + "_ep"
+	eId := string(h) + "_ep_" + u.Hash()
 
 	if _, err := vb.v.DeleteEndpoint(uId, eId); isError(err) {
 		return err
