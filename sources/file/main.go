@@ -1,15 +1,16 @@
 package file
 
 import (
-	"code.google.com/p/go.exp/fsnotify"
 	"encoding/csv"
 	"errors"
-	"github.com/3onyc/hipdate/shared"
-	"github.com/3onyc/hipdate/sources"
 	"log"
 	"os"
 	"path"
 	"sync"
+
+	"github.com/3onyc/hipdate/shared"
+	"github.com/3onyc/hipdate/sources"
+	"gopkg.in/fsnotify.v0"
 )
 
 var (
