@@ -1,11 +1,11 @@
 package file
 
 import (
-	"code.google.com/p/go.exp/fsnotify"
 	"encoding/csv"
 	"errors"
 	"github.com/3onyc/hipdate/shared"
 	"github.com/3onyc/hipdate/sources"
+	"gopkg.in/fsnotify.v1"
 	"log"
 	"os"
 	"path"
@@ -48,7 +48,7 @@ func NewFileSource(
 }
 
 func (fs *FileSource) eventHandler(
-	cfe chan *fsnotify.FileEvent,
+	cfe chan fsnotify.Event,
 	ce chan error,
 ) {
 	for {
@@ -60,7 +60,7 @@ func (fs *FileSource) eventHandler(
 				continue
 			}
 
-			if fe.IsModify() && !fe.IsAttrib() {
+			if fe.Op&fsnotify.Write == fsnotify.Write && fe.Op&fsnotify.Chmod != fsnotify.Chmod {
 				r, err := fs.processFile()
 				if err != nil {
 					log.Println("CRITICAL [source:file]", err)
@@ -79,7 +79,7 @@ func (fs *FileSource) eventHandler(
 
 func (fs *FileSource) Stop() {
 	log.Println("INFO [source:file] Stopping watcher ...")
-	if err := fs.w.RemoveWatch(path.Dir(fs.p)); err != nil {
+	if err := fs.w.Remove(path.Dir(fs.p)); err != nil {
 		log.Println("ERROR [source:file] watcher:", err)
 	}
 
@@ -102,9 +102,9 @@ func (fs *FileSource) Start() {
 	}
 
 	fs.w = w
-	fs.w.Watch(path.Dir(fs.p))
+	fs.w.Add(path.Dir(fs.p))
 
-	fs.eventHandler(fs.w.Event, fs.w.Error)
+	fs.eventHandler(fs.w.Events, fs.w.Errors)
 }
 
 func (fs *FileSource) Initialise() error {

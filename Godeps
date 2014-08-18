@@ -21,6 +21,10 @@
 		{
 			"importpath": "github.com/mailgun/vulcand/plugin/registry",
 			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"Importpath": "gopkg.in/fsnotify.v1",
+			"Rev": "ec00b1a75bca88c04936a6be5f8cdcf74135235f"
 		}
 	]
 }
