@@ -11,8 +11,8 @@
 			"Rev": "bd5c6d56f5500f6dfec24953b0cd3d949383aa65"
 		},
 		{
-			"ImportPath": "github.com/3onyc/stoppableListener",
-			"Rev": "817df4dd7f659a8b6934570bd18da24be4a1af83"
+			"ImportPath": "github.com/hydrogen18/stoppableListener",
+			"Rev": "2eebd04b47ff393f4bc50b7fcacf8f048994c6fd"
 		},
 		{
 			"importpath": "github.com/mailgun/vulcand/api",

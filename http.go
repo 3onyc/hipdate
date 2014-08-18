@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/3onyc/hipdate/backends"
-	"github.com/3onyc/stoppableListener"
+	"github.com/hydrogen18/stoppableListener"
 	"log"
 	"net"
 	"net/http"
