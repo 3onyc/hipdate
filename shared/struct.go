@@ -10,23 +10,6 @@ import (
 	"strings"
 )
 
-type Stoppable struct {
-	stopChan chan bool
-}
-
-func (s Stoppable) ShouldStop() bool {
-	select {
-	case <-s.stopChan:
-		return true
-	default:
-		return false
-	}
-}
-
-func (s Stoppable) setChan(c chan bool) {
-	s.stopChan = c
-}
-
 type OptionMap map[string]string
 type HostList map[Host][]Endpoint
 
