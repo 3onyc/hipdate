@@ -137,9 +137,15 @@ func (fs *FileSource) processFile() ([][]string, error) {
 func (fs *FileSource) processRecords(e string, r [][]string) {
 	for _, l := range r {
 		h := shared.Host(l[0])
-		for _, b := range l[1:] {
-			e := shared.NewChangeEvent(e, h, shared.IPAddress(b))
-			fs.cce <- e
+		for _, u := range l[1:] {
+			ep, err := shared.NewEndpointFromUrl(u)
+			if err != nil {
+				log.Printf("WARN [source:file] Couldn't parse URL %s, skipping", ep, err)
+				continue
+			}
+
+			ce := shared.NewChangeEvent(e, h, *ep)
+			fs.cce <- ce
 		}
 	}
 }

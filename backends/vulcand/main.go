@@ -6,6 +6,7 @@ import (
 	"github.com/3onyc/hipdate/shared"
 	vulcan "github.com/mailgun/vulcand/api"
 	"github.com/mailgun/vulcand/plugin/registry"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -34,14 +35,14 @@ func NewVulcandBackend(opts shared.OptionMap) (backends.Backend, error) {
 	}, nil
 }
 
-func (vb *VulcandBackend) AddUpstream(
+func (vb *VulcandBackend) AddEndpoint(
 	h shared.Host,
-	u shared.Upstream,
+	e shared.Endpoint,
 ) error {
 	hName := string(h)
-	uUrl := string(u)
+	eUrl := e.String()
 	uId := hName + "_up"
-	eId := hName + "_ep_" + u.Hash()
+	eId := hName + "_ep_" + e.Hash()
 	lId := hName + "_loc"
 
 	if _, err := vb.v.AddHost(string(h)); isError(err) {
@@ -52,7 +53,7 @@ func (vb *VulcandBackend) AddUpstream(
 		return err
 	}
 
-	if _, err := vb.v.AddEndpoint(uId, eId, uUrl); isError(err) {
+	if _, err := vb.v.AddEndpoint(uId, eId, eUrl); isError(err) {
 		return err
 	}
 
@@ -62,12 +63,12 @@ func (vb *VulcandBackend) AddUpstream(
 
 	return nil
 }
-func (vb *VulcandBackend) RemoveUpstream(
+func (vb *VulcandBackend) RemoveEndpoint(
 	h shared.Host,
-	u shared.Upstream,
+	e shared.Endpoint,
 ) error {
 	uId := string(h) + "_up"
-	eId := string(h) + "_ep_" + u.Hash()
+	eId := string(h) + "_ep_" + e.Hash()
 
 	if _, err := vb.v.DeleteEndpoint(uId, eId); isError(err) {
 		return err
@@ -118,11 +119,15 @@ func (vb *VulcandBackend) ListHosts() (*shared.HostList, error) {
 		l := vh.Locations[0]
 		h := shared.Host(l.Hostname)
 
-		hl[h] = []shared.Upstream{}
+		hl[h] = []shared.Endpoint{}
 
 		if l.Upstream != nil && len(l.Upstream.Endpoints) > 0 {
 			for _, ep := range l.Upstream.Endpoints {
-				hl[h] = append(hl[h], shared.Upstream(ep.Url))
+				e, err := shared.NewEndpointFromUrl(ep.Url)
+				if err != nil {
+					log.Printf("WARN Couldn't decode URL %s, %s", ep.Url, err)
+				}
+				hl[h] = append(hl[h], *e)
 			}
 		}
 	}

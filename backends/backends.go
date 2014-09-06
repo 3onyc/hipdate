@@ -5,8 +5,8 @@ import (
 )
 
 type Backend interface {
-	AddUpstream(h shared.Host, u shared.Upstream) error
-	RemoveUpstream(h shared.Host, u shared.Upstream) error
+	AddEndpoint(h shared.Host, e shared.Endpoint) error
+	RemoveEndpoint(h shared.Host, e shared.Endpoint) error
 	ListHosts() (*shared.HostList, error)
 	Initialise() error
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/3onyc/hipdate/sources"
 	docker "github.com/fsouza/go-dockerclient"
 	"log"
-	"strings"
 	"sync"
 )
 
@@ -16,7 +15,7 @@ var (
 
 type ContainerMap map[shared.ContainerID]*ContainerData
 type ContainerData struct {
-	IP        shared.IPAddress
+	Endpoint  shared.Endpoint
 	Hostnames []shared.Host
 }
 type DockerSource struct {
@@ -28,9 +27,9 @@ type DockerSource struct {
 	sc         chan bool
 }
 
-func NewContainerData(i shared.IPAddress, h []shared.Host) *ContainerData {
+func NewContainerData(e shared.Endpoint, h []shared.Host) *ContainerData {
 	return &ContainerData{
-		IP:        i,
+		Endpoint:  e,
 		Hostnames: h,
 	}
 }
@@ -118,12 +117,11 @@ func (ds DockerSource) handleAdd(cId shared.ContainerID) error {
 		return err
 	}
 
-	ip := shared.IPAddress(c.NetworkSettings.IPAddress)
-	hs := getHostnames(c)
+	cd := parseContainer(c)
+	ds.Containers[cId] = cd
 
-	ds.Containers[cId] = NewContainerData(ip, hs)
-	for _, h := range hs {
-		e := shared.NewChangeEvent("add", h, ip)
+	for _, h := range cd.Hostnames {
+		e := shared.NewChangeEvent("add", h, cd.Endpoint)
 		ds.cce <- e
 	}
 
@@ -138,7 +136,7 @@ func (ds DockerSource) handleRemove(cId shared.ContainerID) {
 
 	delete(ds.Containers, cId)
 	for _, h := range cd.Hostnames {
-		e := shared.NewChangeEvent("remove", h, cd.IP)
+		e := shared.NewChangeEvent("remove", h, cd.Endpoint)
 		ds.cce <- e
 	}
 }
@@ -154,24 +152,6 @@ func (ds DockerSource) Initialise() error {
 	}
 
 	return nil
-}
-
-// Parse the env variable containing the hostnames
-func parseHostnameVar(hostnameVar string) []string {
-	return strings.Split(hostnameVar, "|")
-}
-
-func getHostnames(c *docker.Container) []shared.Host {
-	env := docker.Env(c.Config.Env)
-	hosts := []shared.Host{}
-
-	if ok := env.Exists("WEB_HOSTNAME"); ok {
-		for _, host := range parseHostnameVar(env.Get("WEB_HOSTNAME")) {
-			hosts = append(hosts, shared.Host(host))
-		}
-	}
-
-	return hosts
 }
 
 func init() {

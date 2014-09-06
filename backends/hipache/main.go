@@ -32,9 +32,9 @@ func NewHipacheBackend(opts shared.OptionMap) (backends.Backend, error) {
 	}, nil
 }
 
-func (hb *HipacheBackend) AddUpstream(
+func (hb *HipacheBackend) AddEndpoint(
 	h shared.Host,
-	u shared.Upstream,
+	e shared.Endpoint,
 ) error {
 	exists, err := hb.hostExists(h)
 	if err != nil {
@@ -47,22 +47,22 @@ func (hb *HipacheBackend) AddUpstream(
 		}
 	}
 
-	if _, err := hb.r.Do("RPUSH", prefixKey(h), u); err != nil {
+	if _, err := hb.r.Do("RPUSH", prefixKey(h), e.String()); err != nil {
 		return err
 	}
-	log.Println("DEBUG [backend:hipache] Upstream added", h, u)
+	log.Println("DEBUG [backend:hipache] Endpoint added", h, e.String())
 
 	return nil
 }
-func (hb *HipacheBackend) RemoveUpstream(
+func (hb *HipacheBackend) RemoveEndpoint(
 	h shared.Host,
-	u shared.Upstream,
+	e shared.Endpoint,
 ) error {
-	if _, err := hb.r.Do("LREM", prefixKey(h), 0, u); err != nil {
+	if _, err := hb.r.Do("LREM", prefixKey(h), 0, e.String()); err != nil {
 		return err
 	}
 
-	log.Println("DEBUG [backend:hipache] Upstream removed", h, u)
+	log.Println("DEBUG [backend:hipache] Endpoint removed", h, e.String())
 	return nil
 }
 
@@ -95,14 +95,18 @@ func (hb *HipacheBackend) ListHosts() (*shared.HostList, error) {
 		}
 
 		h := shared.Host(vs[0])
-		hl[h] = []shared.Upstream{}
+		hl[h] = []shared.Endpoint{}
 
 		if len(vs) < 2 {
 			continue
 		}
 
 		for _, b := range vs[1:] {
-			hl[h] = append(hl[h], shared.Upstream(b))
+			e, err := shared.NewEndpointFromUrl(b)
+			if err != nil {
+				log.Printf("WARN Couldn't decode URL %s, %s", b, err)
+			}
+			hl[h] = append(hl[h], *e)
 		}
 	}
 
