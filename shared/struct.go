@@ -65,7 +65,3 @@ func (u Upstream) Hash() string {
 }
 
 type Host string
-
-func (h Host) Key() string {
-	return "frontend:" + string(h)
-}
