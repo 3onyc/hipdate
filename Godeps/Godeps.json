@@ -1,0 +1,109 @@
+{
+	"ImportPath": "github.com/3onyc/hipdate",
+	"GoVersion": "go1.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.0.0-65-g820deef",
+			"Rev": "820deefc9031d101f085ef773425fc6ca7a5363e"
+		},
+		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Rev": "8d5447b3350dcc7644c7021b3cd57224cbedfa79"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "bd5c6d56f5500f6dfec24953b0cd3d949383aa65"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "708054d61e5a2918b9f4e9700000ee611dcf03f5"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "e718e932ee606838744df844eb75064959eb74bc"
+		},
+		{
+			"ImportPath": "github.com/hydrogen18/stoppableListener",
+			"Rev": "2eebd04b47ff393f4bc50b7fcacf8f048994c6fd"
+		},
+		{
+			"ImportPath": "github.com/mailgun/gotools-api",
+			"Rev": "87768e358c130b8f94627e00f303ecd0863307de"
+		},
+		{
+			"ImportPath": "github.com/mailgun/gotools-log",
+			"Rev": "da2af22c05c9bd65fe86def9dda80c1a2110e06c"
+		},
+		{
+			"ImportPath": "github.com/mailgun/gotools-time",
+			"Rev": "3f148297f09e62c5cc895746877f705d2ddac0d6"
+		},
+		{
+			"ImportPath": "github.com/mailgun/minheap",
+			"Rev": "7c28d80e2ada649fc8ab1a37b86d30a2633bd47c"
+		},
+		{
+			"ImportPath": "github.com/mailgun/timetools",
+			"Rev": "8aaa539a55a0dbab6abd713146bc2c96fb891640"
+		},
+		{
+			"ImportPath": "github.com/mailgun/ttlmap",
+			"Rev": "f0d152bfd08693df7ddf34eb3471460565d633db"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/endpoint",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/errors",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/limit",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/middleware",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/netutils",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/request",
+			"Comment": "v0.1-178-gd63d2d2",
+			"Rev": "d63d2d245fc1ea64b82e154b6303166de1b50a54"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/api",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/backend",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/connwatch",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/plugin",
+			"Rev": "7c71ad72943ba0794c096c9b7f72b1a638432f28"
+		},
+		{
+			"ImportPath": "gopkg.in/check.v1",
+			"Rev": "5b76b26efe7f426789852e983fbde4de62c42282"
+		},
+		{
+			"ImportPath": "gopkg.in/fsnotify.v1",
+			"Rev": "ec00b1a75bca88c04936a6be5f8cdcf74135235f"
+		}
+	]
+}
