@@ -140,7 +140,7 @@ func (fs *FileSource) processRecords(e string, r [][]string) {
 		for _, u := range l[1:] {
 			ep, err := shared.NewEndpointFromUrl(u)
 			if err != nil {
-				log.Printf("WARN [source:file] Couldn't parse URL %s, skipping", ep, err)
+				log.Printf("WARN [source:file] Couldn't parse URL %s, skipping (%s)", ep, err)
 				continue
 			}
 
