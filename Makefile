@@ -5,7 +5,8 @@ test:
 
 check:
 	OUTPUT=$$(gofmt -e -l .); echo $$OUTPUT; [ $$(echo -n "$$OUTPUT" | wc -l) -eq 0 ] || false
-	go vet ./...
+	go tool vet --composites=false backends hipdated shared sources
+	go tool vet --composites=false $(wildcard *.go)
 	#golint ./...
 
 build:
