@@ -1,0 +1,212 @@
+{
+	"ImportPath": "github.com/3onyc/hipdate",
+	"GoVersion": "go1.3",
+	"Packages": [
+		"github.com/3onyc/hipdate/hipdated"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.6.1-12-g0ae5377",
+			"Rev": "0ae53775f7736dbe9bbccbedb3c408f13ce5282e"
+		},
+		{
+			"ImportPath": "github.com/codahale/hdrhistogram",
+			"Rev": "3989c9c70509e52d10cd2b76e254fb570aa4a348"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-42-gfbda1ce",
+			"Rev": "fbda1ce02d5dabcee952040e5f4025753b6c9ce0"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/archive",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/fileutils",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/ioutils",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/pools",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/promise",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/system",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/units",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar",
+			"Comment": "v1.3.0-879-g53d5299",
+			"Rev": "53d5299a40ad149be420bb87e5c97c616c1df821"
+		},
+		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Comment": "0.2.1-324-g11620a6",
+			"Rev": "11620a68c22a84657503068ffc14f2bc292d9aa6"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "cca3df8fa0670249a3f746bcc062c69aeba0517c"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "cca3df8fa0670249a3f746bcc062c69aeba0517c"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "50c25fb3b2b3b3cc724e9b6ac75fb44b3bccd0da"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+		},
+		{
+			"ImportPath": "github.com/hydrogen18/stoppableListener",
+			"Rev": "2eebd04b47ff393f4bc50b7fcacf8f048994c6fd"
+		},
+		{
+			"ImportPath": "github.com/mailgun/go-etcd/etcd",
+			"Comment": "v0.2.0-rc1-124-g248e96a",
+			"Rev": "248e96a4ad7adfa23b531eb2d8e80d9050c33d24"
+		},
+		{
+			"ImportPath": "github.com/mailgun/log",
+			"Rev": "fc69e9c6ba9a63f09fd26f432f5358dae645c508"
+		},
+		{
+			"ImportPath": "github.com/mailgun/manners",
+			"Comment": "0.3.1-12-g69a4adc",
+			"Rev": "69a4adcf8fc04e8aef0ed5f9e43982739220ed8f"
+		},
+		{
+			"ImportPath": "github.com/mailgun/metrics",
+			"Rev": "f8741d1789ec85faeede37702eadbf5acb945e85"
+		},
+		{
+			"ImportPath": "github.com/mailgun/minheap",
+			"Rev": "7c28d80e2ada649fc8ab1a37b86d30a2633bd47c"
+		},
+		{
+			"ImportPath": "github.com/mailgun/predicate",
+			"Rev": "cb0bff91a7ab7cf7571e661ff883fc997bc554a3"
+		},
+		{
+			"ImportPath": "github.com/mailgun/scroll",
+			"Rev": "97511e5508c6666efa189769aff63d694e58d655"
+		},
+		{
+			"ImportPath": "github.com/mailgun/timetools",
+			"Rev": "7e6055773c5137efbeb3bd2410d705fe10ab6bfd"
+		},
+		{
+			"ImportPath": "github.com/mailgun/ttlmap",
+			"Rev": "51994f8e1aad271eb214e725379dde8bd4c90acf"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/circuitbreaker",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/endpoint",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/errors",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/headers",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/limit",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/loadbalance",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/location/httploc",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/metrics",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/middleware",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/netutils",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/request",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/template",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcan/threshold",
+			"Comment": "v0.1-244-g961decf",
+			"Rev": "961decfd08c4460fb7cd0001e1b100e6cce31435"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/anomaly",
+			"Rev": "22c6c06da0015477db17dc4f5c9618ccda1e66bc"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/api",
+			"Rev": "22c6c06da0015477db17dc4f5c9618ccda1e66bc"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/backend",
+			"Rev": "22c6c06da0015477db17dc4f5c9618ccda1e66bc"
+		},
+		{
+			"ImportPath": "github.com/mailgun/vulcand/plugin",
+			"Rev": "22c6c06da0015477db17dc4f5c9618ccda1e66bc"
+		},
+		{
+			"ImportPath": "gopkg.in/fsnotify.v1",
+			"Comment": "v1.0.4",
+			"Rev": "ca50e738d35a862c379baf8fffbc3bfd080b3cff"
+		}
+	]
+}

@@ -1,7 +1,9 @@
-all: deps build
+all: test build
 
-deps:
-	godep restore
+test:
+	godep go test ./...
 
 build:
-	go install github.com/3onyc/hipdate/hipdated
+	godep go install github.com/3onyc/hipdate/hipdated
+
+.PHONY: all test build
