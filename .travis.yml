@@ -4,9 +4,12 @@ go:
   - release
   - tip
 before_install:
-  - go get code.google.com/p/go.tools/cmd/vet
   - go get github.com/tools/godep
   - godep restore
+  # Release/1.3
+  - go get code.google.com/p/go.tools/cmd/vet
+  # Tip
+  - go get golang.org/x/tools/cmd/vet
 script:
   - make check
   - make test
