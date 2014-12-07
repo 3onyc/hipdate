@@ -10,6 +10,6 @@ check:
 	#golint ./...
 
 build:
-	godep go install github.com/3onyc/hipdate/hipdated
+	godep go build -o hipdated-$(shell uname -m) github.com/3onyc/hipdate/hipdated
 
 .PHONY: all test build check
